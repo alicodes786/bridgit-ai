@@ -716,11 +716,13 @@
           <div id="nav-scrim" class="nav-scrim"></div>
           <aside id="side" class="side w-[268px] text-mist flex flex-col shrink-0">
             <div class="px-4 pt-5 pb-3 flex items-center gap-3">
-              <img src="/static/MA_logo.jpg" alt="MA Associates" class="h-9 w-9 rounded-full object-cover bg-white" />
-              <div class="min-w-0 flex-1">
-                <p class="text-sm font-semibold tracking-tight">Bridgit</p>
-                <p class="text-[11px] text-muted">MA Associates</p>
-              </div>
+              <button type="button" id="go-home" class="flex items-center gap-3 min-w-0 flex-1 text-left" title="Home">
+                <img src="/static/MA_logo.jpg" alt="" class="h-9 w-9 rounded-full object-cover bg-white" />
+                <span class="min-w-0">
+                  <span class="block text-sm font-semibold tracking-tight">Bridgit</span>
+                  <span class="block text-[11px] text-muted">Home</span>
+                </span>
+              </button>
               <button type="button" id="side-close" class="h-8 w-8 rounded-full border border-white/10 text-muted text-sm" aria-label="Close jobs">‹</button>
             </div>
             <button id="new-job-btn" type="button" class="mx-3 mb-2 py-2.5 px-3 rounded-full bg-mist text-navy font-semibold text-sm hover:opacity-90">
@@ -776,6 +778,11 @@
       document.getElementById("new-job-btn").onclick = () => {
         setNav(false);
         openNewJobModal();
+      };
+      document.getElementById("go-home").onclick = () => {
+        setNav(false);
+        location.hash = "#/jobs";
+        route();
       };
       document.getElementById("how-it-works").onclick = () => openCoach(true);
       refreshSidebar();
@@ -1160,6 +1167,7 @@
                 <p class="text-[11px] text-muted truncate mt-0.5">${esc(j.client_name || "")}${workingFileShort(j) ? " · " + esc(workingFileShort(j)) : ""}</p>
               </div>
               <div class="job-slim-actions">
+                <button type="button" id="job-home" class="text-sm text-muted underline underline-offset-2">Home</button>
                 ${modeToggle}
                 ${open ? `<button type="button" id="toggle-questions" class="text-sm border border-white/10 px-3 py-1 rounded-full">${showQ ? "Hide questions" : "Questions (" + open + ")"}</button>` : ""}
                 <a class="text-sm text-mist underline underline-offset-2" href="/jobs/${esc(j.id)}/working-file">Working Excel</a>
@@ -1273,6 +1281,11 @@
       const chatBtn = document.getElementById("view-chat");
       if (cardsBtn) cardsBtn.onclick = () => { setView("cards"); renderJobDetail(lastJob); };
       if (chatBtn) chatBtn.onclick = () => { setView("chat"); renderJobDetail(lastJob); };
+      const jobHome = document.getElementById("job-home");
+      if (jobHome) jobHome.onclick = () => {
+        location.hash = "#/jobs";
+        route();
+      };
       const exportChat = document.getElementById("export-job-chat");
       if (exportChat) exportChat.onclick = () => {
         const rows = (lastJob && lastJob.chat) || [];
