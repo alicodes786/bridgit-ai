@@ -376,13 +376,12 @@ is not a stale upsert.
 **Status:** final for Phase 1 working file. Notes:
 [36-oct25-session.md](./36-oct25-session.md).
 
-### Decision 31 — Job-aware conversation, progress summary, export like Claude
-**Decided:** Beyond coding Q&A, Bridgit should hold **normal conversations**
-about the job it is working on: what data it has (files, line counts, rec status,
-open questions, remembered payees), **how things are going** in plain language,
-and optional **export** of chat and/or job facts (transcript, summary markdown,
-structured snapshot) similar to Claude’s export — without inventing figures or
-coding actions outside open exceptions.
+### Decision 31 — Normal conversation about the work, not only inside a job
+**Decided:** Bridgit talks like Claude about the bookkeeping work. The team is
+**not** limited to a script, and **not** limited to having a job open. Home is a
+desk conversation across clients and jobs. Inside a job, the same natural talk
+stays grounded on that job and can still code a line when that is the intent.
+Export is a transcript download. No invented figures.
 **Date:** 1 Nov 2026.
 **Why:** `/app` should feel like a proper SaaS agent, not only a form with a
 chat box for “Motor vs Phone”. Accountants will ask “where are we?” and want

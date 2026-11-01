@@ -74,4 +74,6 @@ def clear_session_cookie(response: Response) -> None:
 
 
 def is_protected_path(path: str) -> bool:
+    if path == "/meta/chat":
+        return True
     return path == "/jobs" or path.startswith("/jobs/")

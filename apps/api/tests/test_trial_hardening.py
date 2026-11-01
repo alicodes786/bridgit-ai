@@ -15,7 +15,13 @@ from app.auth import (
     set_session_cookie,
 )
 from app.config import settings
-from app.engine.chat import _job_facts, answer_from_job, match_resolve_intent
+from app.engine.chat import (
+    _job_facts,
+    answer_from_job,
+    match_resolve_intent,
+    portfolio_digest,
+    workspace_fallback,
+)
 from app.jobs_store import approve_reason, match_client_row, normalize_client_name
 
 
@@ -240,6 +246,28 @@ class ChatIntentTests(unittest.TestCase):
         }
         reply = answer_from_job("is our working file ready?", job, [], [])
         self.assertIn("16", reply)
+
+
+class WorkspaceChatTests(unittest.TestCase):
+    def test_desk_chat_does_not_need_a_job(self):
+        self.assertTrue(is_protected_path("/meta/chat"))
+        reply = workspace_fallback("how are we doing?", [])
+        self.assertIn("no jobs", reply.lower())
+
+    def test_digest_names_a_client(self):
+        jobs = [{
+            "id": "1",
+            "title": "Meridian live",
+            "client_name": "Meridian Studio Ltd",
+            "status": "needs_input",
+            "job_type_label": "Year-end",
+            "engine": {"coded": 10, "exceptions": 2, "bank_rec": {"ok": True, "difference": 0}},
+            "documents": [{"kind": "bank", "file_name": "bank.csv"}, {"kind": "working_file", "file_name": "out.xlsx"}],
+        }]
+        digest = portfolio_digest(jobs)
+        self.assertEqual(digest[0]["files"], ["bank.csv"])
+        reply = workspace_fallback("what about meridian studio ltd", jobs)
+        self.assertIn("Meridian", reply)
 
 
 if __name__ == "__main__":

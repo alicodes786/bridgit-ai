@@ -6,6 +6,7 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from app.engine.chat import ChatError, handle_workspace_chat
 from app.auth import (
     clear_session_cookie,
     is_protected_path,
@@ -92,6 +93,20 @@ def app_meta():
 
 class PasswordBody(BaseModel):
     pw: str = ""
+
+
+class WorkspaceChatBody(BaseModel):
+    message: str = ""
+    history: list[dict] = []
+
+
+@app.post("/meta/chat")
+def workspace_chat(body: WorkspaceChatBody):
+    try:
+        reply = handle_workspace_chat(body.message, body.history)
+    except ChatError as exc:
+        return JSONResponse({"detail": str(exc)}, status_code=400)
+    return {"reply": reply}
 
 
 @app.post("/meta/password-check")

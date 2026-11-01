@@ -100,8 +100,9 @@ def handle_chat(job_id: str, message: str) -> dict:
             source = "llm"
         else:
             reply = _llm_answer(text, job, exceptions, accounts, mappings) or (
-                "I can code a line if you name the payee and the account, "
-                "or ask about this job (bank rec, what was auto-coded, what is still open)."
+                "I can talk through this job with you: what is coded, what is still open, "
+                "the files on it, and whether the working Excel is ready. "
+                "If you want a line coded, name the payee and the column."
             )
             source = "llm" if reply else "fallback"
         job = get_job(job_id)
@@ -442,12 +443,22 @@ def _llm_intent(
     if not settings.anthropic_api_key.strip():
         return None
     facts = _job_facts(job, exceptions, accounts, mappings)
-    prompt = f"""You are Bridgit, MA Associates bookkeeping assistant, chatting with the accountant on ONE job.
-Use only the facts JSON. Do not invent payees, amounts, or exception ids.
-saved_mappings are this client's permanent knowledge: answers the accountant gives are stored there and reused on the next job.
-If they are answering a coding question, set intent=resolve and copy an exception id from open_questions.
-If they are asking anything else, intent=answer and put a short reply in reply (ASCII hyphen, never em dash).
-VAT codes: SR ZR EX NV OS. This is a bank working file, not a finished statutory pack.
+    prior = []
+    for turn in (job.get("chat") or [])[-8:]:
+        bit = (turn.get("text") or "").strip()
+        if not bit or bit == message.strip():
+            continue
+        prior.append({"role": turn.get("role") or "user", "text": bit[:600]})
+    prompt = f"""You are Bridgit, the MA Associates bookkeeping agent. Talk like a colleague, not a form.
+The accountant may discuss this job in ordinary language: progress, files, payees, the bank rec, what to do next, or how the working file is coming along. Do not limit them to coding commands.
+Use only the facts JSON and the recent turns. Do not invent payees, amounts, counts, or exception ids.
+saved_mappings are this client's permanent knowledge and are reused on the next job.
+If they are clearly answering one open question, set intent=resolve and copy that exception id.
+Otherwise intent=answer and write a natural reply in reply (ASCII hyphen, never em dash).
+VAT codes: SR ZR EX NV OS. The download is a bank working file, not a finished statutory pack or ETB.
+
+Recent turns:
+{json.dumps(prior, ensure_ascii=True)}
 
 Facts:
 {json.dumps(facts, ensure_ascii=True)}
@@ -494,6 +505,129 @@ Return JSON only:
             "reply": data.get("reply") or "",
         }
     return {"intent": "answer", "reply": data.get("reply") or ""}
+
+
+def portfolio_digest(jobs: list[dict]) -> list[dict]:
+    """Short facts for a conversation that is not pinned to one job."""
+    rows = []
+    for job in jobs[:30]:
+        eng = job.get("engine") or {}
+        rec = eng.get("bank_rec") or {}
+        papers = [
+            d.get("file_name") or d.get("kind")
+            for d in (job.get("documents") or [])
+            if d.get("kind") not in {"working_file", "summary_pdf"}
+        ]
+        rows.append({
+            "id": job.get("id"),
+            "title": job.get("title"),
+            "client": job.get("client_name"),
+            "status": job.get("status"),
+            "type": job.get("job_type_label") or job.get("job_type"),
+            "period_start": job.get("period_start"),
+            "period_end": job.get("period_end"),
+            "coded": eng.get("coded"),
+            "open_questions": eng.get("exceptions"),
+            "bank_rec_ok": rec.get("ok"),
+            "bank_rec_difference": rec.get("difference"),
+            "files": papers[:8],
+        })
+    return rows
+
+
+def workspace_fallback(message: str, jobs: list[dict]) -> str:
+    digest = portfolio_digest(jobs)
+    if not digest:
+        return (
+            "There are no jobs yet. Start one with a bank file and, for year-end, last year's Excel. "
+            "You can keep talking here even before a job exists."
+        )
+    low = (message or "").lower()
+    waiting = [r for r in digest if r.get("status") == "needs_input"]
+    ready = [r for r in digest if r.get("status") in {"ready_for_review", "approved"}]
+    if any(w in low for w in ("how are", "summary", "summar", "where are we", "what's going", "whats going", "status")):
+        bits = [
+            f"{len(digest)} job{'s' if len(digest) != 1 else ''} on the desk.",
+            f"{len(waiting)} still need an answer." if waiting else "Nothing is waiting on a question.",
+            f"{len(ready)} working file{'s' if len(ready) != 1 else ''} ready to download." if ready else "No working file is ready yet.",
+        ]
+        names = ", ".join(f"{r.get('client') or 'Client'} ({r.get('title')})" for r in digest[:5])
+        return " ".join(bits) + " Recent: " + names + "."
+    for row in digest:
+        client = (row.get("client") or "").lower()
+        title = (row.get("title") or "").lower()
+        if client and client in low or (title and title in low):
+            open_n = row.get("open_questions")
+            rec = "ties" if row.get("bank_rec_ok") else (
+                f"difference {row.get('bank_rec_difference')}" if row.get("bank_rec_difference") is not None else "not checked"
+            )
+            files = ", ".join(row.get("files") or []) or "none listed"
+            return (
+                f"{row.get('title')} for {row.get('client')} is {row.get('status')}. "
+                f"Coded lines recorded: {row.get('coded') if row.get('coded') is not None else 'unknown'}. "
+                f"Open questions recorded: {open_n if open_n is not None else 'unknown'}. "
+                f"Bank check: {rec}. Files: {files}. "
+                "Open that job in the sidebar if you want to code a line or download the working Excel."
+            )
+    return (
+        f"I can see {len(digest)} job{'s' if len(digest) != 1 else ''}. "
+        "Ask how things are going, or name a client. "
+        "Coding a single line happens inside that job. "
+        "The download is the bank working file, not the statutory pack."
+    )
+
+
+def handle_workspace_chat(message: str, history: list[dict] | None = None) -> str:
+    """Conversation across the desk. Does not require a job to be open."""
+    from app.jobs_store import list_jobs
+
+    text = (message or "").strip()
+    if not text:
+        raise ChatError("Type a message first.")
+    if len(text) > _MAX_MESSAGE:
+        raise ChatError("Message is too long.")
+    jobs = list_jobs()
+    digest = portfolio_digest(jobs)
+    if not settings.anthropic_api_key.strip():
+        return _no_em(workspace_fallback(text, jobs))
+    prior = []
+    for turn in (history or [])[-10:]:
+        bit = (turn.get("text") or "").strip()
+        role = turn.get("role") or "user"
+        if bit:
+            prior.append({"role": role, "text": bit[:600]})
+    prompt = f"""You are Bridgit, the MA Associates bookkeeping agent.
+The team can talk to you with no job open, about any of their jobs, clients, files, or how the work is going. Speak naturally, like Claude would, but stay on the bookkeeping work.
+Use only the jobs JSON and the recent turns. Do not invent counts, payees, or amounts.
+If they want a line coded, tell them to open that job. The Excel download is a bank working file, not an ETB or statutory pack.
+ASCII hyphen only, never an em dash.
+
+Recent turns:
+{json.dumps(prior, ensure_ascii=True)}
+
+Jobs:
+{json.dumps(digest, ensure_ascii=True)}
+
+Accountant:
+{text}
+"""
+    try:
+        import anthropic
+
+        client = anthropic.Anthropic(api_key=settings.anthropic_api_key.strip())
+        message_out = client.messages.create(
+            model=_MODEL,
+            max_tokens=900,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        out = "".join(
+            block.text for block in message_out.content if getattr(block, "type", "") == "text"
+        ).strip()
+        if out:
+            return _no_em(out)
+    except Exception:
+        log.exception("workspace chat failed")
+    return _no_em(workspace_fallback(text, jobs))
 
 
 def _llm_answer(
