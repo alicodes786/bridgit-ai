@@ -148,13 +148,12 @@
       padding: 2px 8px; border-radius: 999px; border: 1px solid #243044;
       white-space: nowrap; flex-shrink: 0;
     }
-    .job-head { display: flex; flex-direction: column; align-items: stretch; gap: 16px; }
-    .job-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .job-head { display: flex; flex-direction: column; align-items: stretch; gap: 28px; }
+    .job-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 28px; }
+    .job-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
     .job-downloads {
-      display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: center;
-      padding-top: 2px;
+      display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center;
     }
-    .job-downloads span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #8b93a1; }
     .job-downloads a, .job-downloads button {
       font-size: 13px; color: #d5d8de; background: none; border: 0; padding: 0;
       text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
@@ -165,23 +164,23 @@
     .file-chip li { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .fact-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
-      gap: 8px;
-      margin-top: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-top: 28px;
     }
     .fact strong { overflow-wrap: break-word; }
-    .app-bar {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.06);
-    }
     .nav-scrim { display: none; }
-    #app-shell.nav-collapsed #side {
-      width: 0; min-width: 0; overflow: hidden; border-right: 0; opacity: 0; pointer-events: none;
-    }
+    .jobs-fab { display: none; }
+    .side-close { display: none; }
     html[data-theme="light"] .job-downloads a,
     html[data-theme="light"] .job-downloads button { color: #3d4450; }
     @media (max-width: 860px) {
-      #app-shell.nav-collapsed #side { width: min(288px, 88vw); opacity: 1; pointer-events: auto; }
+      .jobs-fab {
+        display: inline-flex; position: fixed; z-index: 25; top: 14px; left: 14px;
+        border: 1px solid rgba(255,255,255,.12); border-radius: 999px;
+        padding: 6px 12px; font-size: 13px; background: rgba(12,14,18,.9); color: #f4f1ea;
+      }
+      .side-close { display: inline-flex; }
       .side {
         position: fixed; z-index: 40; top: 0; bottom: 0; left: 0;
         width: min(288px, 88vw);
@@ -266,7 +265,7 @@
       100% { box-shadow: 0 0 0 8px rgba(61,190,134,0); }
     }
     html[data-theme="light"] .side { background: rgba(255,255,255,.96); border-right-color: rgba(16,18,24,.06); }
-    html[data-theme="light"] .app-bar { border-bottom-color: rgba(16,18,24,.08); }
+    html[data-theme="light"] .jobs-fab { background: #fff; color: #16181d; border-color: rgba(16,18,24,.12); }
     html[data-theme="light"] .job-row:hover { background: rgba(16,18,24,.04); }
     html[data-theme="light"] .job-row.active { background: rgba(16,18,24,.05); border-color: rgba(16,18,24,.1); }
     html[data-theme="light"] .view-btn.active { background: #16181d; color: #f7f8fa; }
@@ -736,10 +735,7 @@
             </div>
           </aside>
           <div class="flex-1 min-w-0 min-h-0 flex flex-col">
-            <div class="app-bar shrink-0">
-              <button type="button" id="nav-toggle" class="text-sm border border-white/10 rounded-full px-3 py-1 text-mist">Jobs</button>
-              <span class="text-sm font-medium text-mist">Bridgit</span>
-            </div>
+            <button type="button" id="nav-toggle" class="jobs-fab">Jobs</button>
             <main id="main" class="stage flex-1 min-h-0 flex flex-col overflow-hidden"></main>
           </div>
         </div>
@@ -756,27 +752,11 @@
         route();
       };
       bindTheme("theme-toggle");
-      const narrow = () => window.innerWidth <= 860;
       const setNav = (open) => {
-        if (narrow()) {
-          document.getElementById("side").classList.toggle("open", open);
-          document.getElementById("nav-scrim").classList.toggle("show", open);
-          document.getElementById("nav-toggle").textContent = open ? "Hide jobs" : "Show jobs";
-          return;
-        }
-        document.getElementById("app-shell").classList.toggle("nav-collapsed", !open);
-        document.getElementById("nav-toggle").textContent = open ? "Hide jobs" : "Show jobs";
-        try { localStorage.setItem("bridgit_nav_open", open ? "1" : "0"); } catch (e) {}
+        document.getElementById("side").classList.toggle("open", open);
+        document.getElementById("nav-scrim").classList.toggle("show", open);
       };
-      const navOpen = () => {
-        if (narrow()) return document.getElementById("side").classList.contains("open");
-        return !document.getElementById("app-shell").classList.contains("nav-collapsed");
-      };
-      try {
-        if (!narrow() && localStorage.getItem("bridgit_nav_open") === "0") setNav(false);
-        else document.getElementById("nav-toggle").textContent = "Hide jobs";
-      } catch (e) {}
-      document.getElementById("nav-toggle").onclick = () => setNav(!navOpen());
+      document.getElementById("nav-toggle").onclick = () => setNav(true);
       document.getElementById("side-close").onclick = () => setNav(false);
       document.getElementById("nav-scrim").onclick = () => setNav(false);
       document.getElementById("hide-tests").onclick = () => {
@@ -785,7 +765,7 @@
         refreshSidebar();
       };
       document.getElementById("new-job-btn").onclick = () => {
-        if (narrow()) setNav(false);
+        setNav(false);
         openNewJobModal();
       };
       document.getElementById("how-it-works").onclick = () => openCoach(true);
@@ -971,12 +951,8 @@
         btn.onclick = () => {
           const side = document.getElementById("side");
           const scrim = document.getElementById("nav-scrim");
-          if (window.innerWidth <= 860) {
-            if (side) side.classList.remove("open");
-            if (scrim) scrim.classList.remove("show");
-            const toggle = document.getElementById("nav-toggle");
-            if (toggle) toggle.textContent = "Show jobs";
-          }
+          if (side) side.classList.remove("open");
+          if (scrim) scrim.classList.remove("show");
           location.hash = "#/job/" + btn.dataset.id;
           route();
         };
@@ -1134,10 +1110,9 @@
         </div>`;
       const dl = `
         <div class="job-downloads">
-          <span>Downloads</span>
           <a href="/jobs/${esc(j.id)}/working-file">Working Excel</a>
           <a href="/jobs/${esc(j.id)}/summary.pdf">Summary</a>
-          <button type="button" id="export-job-chat">Chat</button>
+          <button type="button" id="export-job-chat">Download chat</button>
         </div>`;
       const codedFact = n ? codedShown + " of " + n : "Not coded yet";
       const recFact = recDiff == null ? "Not checked" : (recOk ? "Ties · £0.00" : "Off by £" + recDiff);
@@ -1166,14 +1141,16 @@
         main.className = "stage flex-1 min-h-0 flex flex-col overflow-hidden";
         const chatMsgs = (j.chat || []).map(m => bubble(m.role, m.text)).join("");
         main.innerHTML = `
-          <header class="shrink-0 px-4 sm:px-6 pt-5 pb-5 border-b border-white/6">
+          <header class="shrink-0 px-6 sm:px-8 pt-8 pb-8">
             <div class="job-head">
               ${titleBlock}
-              <div class="job-toolbar">
-                ${modeToggle}
-                ${open ? `<button type="button" id="toggle-questions" class="text-sm border border-white/10 px-3 py-1.5 rounded-full">${showQ ? "Hide questions" : "Show questions (" + open + ")"}</button>` : ""}
+              <div class="job-bar">
+                <div class="job-toolbar">
+                  ${modeToggle}
+                  ${open ? `<button type="button" id="toggle-questions" class="text-sm border border-white/10 px-3 py-1.5 rounded-full">${showQ ? "Hide questions" : "Show questions (" + open + ")"}</button>` : ""}
+                </div>
+                ${dl}
               </div>
-              ${dl}
             </div>
             ${factGrid}
           </header>
@@ -1216,15 +1193,17 @@
       } else {
         main.className = "stage flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 md:p-8";
         main.innerHTML = `
-          <header class="mb-8">
+          <header class="mb-10 px-2">
             <div class="job-head">
               ${titleBlock}
-              <div class="job-toolbar">
-                ${modeToggle}
-                <button type="button" id="cards-attach" class="text-sm border border-white/10 px-3 py-1.5 rounded-full hover:bg-white/5">Add files</button>
-                <input type="file" id="cards-files" class="hidden" multiple accept=".pdf,.csv,.xlsx,.xlsm,.jpg,.jpeg,.png,.webp,.txt" />
+              <div class="job-bar">
+                <div class="job-toolbar">
+                  ${modeToggle}
+                  <button type="button" id="cards-attach" class="text-sm border border-white/10 px-3 py-1.5 rounded-full hover:bg-white/5">Add files</button>
+                  <input type="file" id="cards-files" class="hidden" multiple accept=".pdf,.csv,.xlsx,.xlsm,.jpg,.jpeg,.png,.webp,.txt" />
+                </div>
+                ${dl}
               </div>
-              ${dl}
             </div>
             ${factGrid}
           </header>
