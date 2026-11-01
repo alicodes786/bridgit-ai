@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MA Associates · AI Accounting System Proposal</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface2: #f1f5f9;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #1d4ed8;
+    --accent-light: #eff6ff;
+    --accent-mid: #3b82f6;
+    --green: #16a34a;
+    --green-light: #f0fdf4;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --phase1: #1d4ed8;
+    --phase2: #7c3aed;
+    --phase3: #059669;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,.10);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 16px;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .nav-brand { font-weight: 700; font-size: 1rem; color: var(--accent); letter-spacing: -.3px; }
+  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links a { text-decoration: none; color: var(--muted); font-size: .875rem; font-weight: 500; transition: color .15s; }
+  .nav-links a:hover { color: var(--text); }
+
+  /* SECTIONS */
+  section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+  section.full { max-width: 100%; padding: 5rem 0; }
+
+  h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; letter-spacing: -.04em; line-height: 1.15; }
+  h2 { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; letter-spacing: -.03em; }
+  h3 { font-size: 1.125rem; font-weight: 700; }
+  p { color: var(--muted); }
+  strong { color: var(--text); }
+
+  /* HERO */
+  .hero {
+    max-width: 100%; padding: 0;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1d4ed8 100%);
+    color: white;
+  }
+  .hero-inner { max-width: 1100px; margin: 0 auto; padding: 6rem 2rem 5rem; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+    padding: .35rem .9rem; border-radius: 100px; font-size: .8rem; font-weight: 600;
+    letter-spacing: .05em; text-transform: uppercase; color: #bfdbfe;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 { color: white; max-width: 780px; }
+  .hero h1 span { color: #93c5fd; }
+  .hero-sub { font-size: 1.2rem; color: #94a3b8; margin: 1.25rem 0 2.5rem; max-width: 640px; }
+  .hero-sub strong { color: #e2e8f0; }
+  .hero-stats { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 3rem; border-top: 1px solid rgba(255,255,255,.1); padding-top: 2rem; }
+  .stat { display: flex; flex-direction: column; }
+  .stat-num { font-size: 2rem; font-weight: 800; color: white; letter-spacing: -.04em; }
+  .stat-label { font-size: .8rem; color: #94a3b8; font-weight: 500; margin-top: .15rem; }
+
+  /* PILL TAGS */
+  .pill { display: inline-flex; align-items: center; gap: .35rem; font-size: .78rem; font-weight: 600;
+    padding: .2rem .7rem; border-radius: 100px; letter-spacing: .02em; }
+  .pill-blue { background: var(--accent-light); color: var(--accent); }
+  .pill-green { background: var(--green-light); color: var(--green); }
+  .pill-amber { background: var(--amber-light); color: var(--amber); }
+
+  /* PRINCIPLES */
+  .principles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+  .principle-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.75rem;
+    box-shadow: var(--shadow);
+  }
+  .principle-icon { font-size: 2rem; margin-bottom: 1rem; }
+  .principle-card h3 { margin-bottom: .5rem; }
+
+  /* UI SECTION */
+  .ui-section { background: var(--surface2); }
+  .ui-mockup {
+    margin-top: 3rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .ui-topbar {
+    background: #0f172a;
+    padding: .6rem 1.25rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .ui-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .ui-topbar-label { color: #64748b; font-size: .78rem; margin-left: .5rem; }
+  .ui-body { display: grid; grid-template-columns: 220px 1fr 320px; min-height: 420px; }
+  @media (max-width: 800px) { .ui-body { grid-template-columns: 1fr; } }
+  .ui-sidebar {
+    border-right: 1px solid var(--border);
+    padding: 1.25rem;
+    background: #f8fafc;
+  }
+  .ui-sidebar-label { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: .75rem; }
+  .ui-nav-item {
+    padding: .5rem .75rem; border-radius: 8px; font-size: .85rem; font-weight: 500;
+    color: var(--muted); margin-bottom: .25rem; cursor: default;
+  }
+  .ui-nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+  .ui-main { padding: 1.5rem; border-right: 1px solid var(--border); }
+  .ui-main-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+  .ui-job-card {
+    border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: .75rem;
+    font-size: .85rem;
+  }
+  .ui-job-card .job-name { font-weight: 600; color: var(--text); margin-bottom: .3rem; }
+  .ui-job-card .job-meta { color: var(--muted); font-size: .8rem; }
+  .ui-status { display: inline-block; padding: .15rem .55rem; border-radius: 100px; font-size: .72rem; font-weight: 700; }
+  .ui-status.running { background: #dbeafe; color: #1d4ed8; }
+  .ui-status.review { background: #fef9c3; color: #854d0e; }
+  .ui-status.done { background: var(--green-light); color: var(--green); }
+  .ui-chat { padding: 1.25rem; display: flex; flex-direction: column; gap: .75rem; }
+  .ui-chat-label { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: .25rem; }
+  .chat-bubble {
+    padding: .65rem .9rem; border-radius: 10px; font-size: .83rem; line-height: 1.45; max-width: 90%;
+  }
+  .chat-bubble.system { background: #f1f5f9; color: var(--text); align-self: flex-start; }
+  .chat-bubble.user { background: var(--accent); color: white; align-self: flex-end; }
+  .chat-bubble.ai { background: var(--green-light); color: #166534; align-self: flex-start; border: 1px solid #bbf7d0; }
+  .ui-features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+  @media (max-width: 900px) { .ui-features-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .ui-features-grid { grid-template-columns: 1fr; } }
+  .ui-feature {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    font-family: inherit;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+  }
+  .ui-feature:hover, .ui-feature:focus-visible {
+    border-color: var(--accent-mid);
+    box-shadow: 0 8px 24px rgba(29,78,216,.14);
+    transform: translateY(-2px);
+    outline: none;
+  }
+  .ui-feature-icon { font-size: 1.5rem; margin-bottom: .6rem; }
+  .ui-feature h4 { font-size: .95rem; margin-bottom: .35rem; color: var(--text); }
+  .ui-feature p { font-size: .85rem; }
+  .click-hint {
+    display: inline-flex; align-items: center; gap: .35rem;
+    margin-top: .75rem; font-size: .72rem; font-weight: 700;
+    letter-spacing: .04em; text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .flow-strip {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: .6rem;
+    margin-top: 2rem;
+  }
+  @media (max-width: 800px) { .flow-strip { grid-template-columns: 1fr 1fr; } }
+  .flow-step {
+    background: white; border: 1px solid var(--border); border-radius: 10px;
+    padding: .85rem .9rem; text-align: left;
+  }
+  .flow-n {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--accent);
+    color: white; font-size: .7rem; font-weight: 800;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: .45rem;
+  }
+  .flow-step strong { display: block; font-size: .82rem; margin-bottom: .2rem; }
+  .flow-step span { font-size: .75rem; color: var(--muted); }
+
+  .ex-table {
+    width: 100%; border-collapse: collapse; font-size: .82rem;
+  }
+  .ex-table th, .ex-table td {
+    padding: .7rem .85rem; text-align: left; vertical-align: middle;
+    border-bottom: 1px solid var(--border);
+  }
+  .ex-table th {
+    background: var(--surface2); font-size: .68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+  }
+  .ex-table td.amt { font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; width: 92px; }
+  .ex-table td.why { color: var(--muted); }
+  .ex-table td.act { white-space: nowrap; width: 1%; }
+  .ex-table tr:last-child td { border-bottom: none; }
+  .act-btns { display: flex; gap: .35rem; }
+  .act-btns button {
+    padding: .3rem .65rem; border-radius: 6px; font-size: .75rem; font-weight: 600;
+    cursor: default; font-family: inherit;
+  }
+  .btn-pri { background: var(--accent); color: white; border: none; }
+  .btn-sec { background: white; color: var(--text); border: 1px solid var(--border); }
+
+  .modal-root {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(15,23,42,.62); padding: 2rem 1rem;
+    overflow: auto; align-items: flex-start; justify-content: center;
+  }
+  .modal-root:target { display: flex; }
+  .modal-scrim { position: absolute; inset: 0; }
+  .modal-card {
+    background: white; border-radius: 16px; width: min(980px, 100%);
+    margin: 2rem auto; box-shadow: var(--shadow-lg); overflow: hidden;
+    position: relative; z-index: 1;
+  }
+  .modal-head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+  }
+  .modal-head h3 { font-size: 1.15rem; }
+  .modal-head p { font-size: .88rem; margin-top: .25rem; }
+  .modal-x {
+    width: 36px; height: 36px; border: none; background: var(--surface2);
+    border-radius: 8px; font-size: 1.2rem; cursor: pointer; color: var(--text);
+    flex-shrink: 0; text-decoration: none; display: flex; align-items: center;
+    justify-content: center; line-height: 1;
+  }
+  .modal-body { padding: 1.5rem; background: var(--surface2); }
+  .visual-note { font-size: .8rem; color: var(--muted); margin-top: .85rem; }
+  .modal-split { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 700px) { .modal-split { grid-template-columns: 1fr; } }
+
+  /* PHASES */
+  .phases-bg { background: #0f172a; padding: 5rem 0; }
+  .phases-inner { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+  .phases-inner .section-tag { color: #93c5fd; }
+  .phases-inner h2 { color: white; }
+  .phases-inner .section-sub { color: #94a3b8; }
+  .phase-timeline { display: flex; flex-direction: column; gap: 0; margin-top: 3rem; position: relative; }
+  .phase-timeline::before {
+    content: ''; position: absolute; left: 28px; top: 0; bottom: 0; width: 2px;
+    background: rgba(255,255,255,.12);
+  }
+  .phase-row { display: flex; gap: 2rem; position: relative; padding-bottom: 3rem; }
+  .phase-row:last-child { padding-bottom: 0; }
+  .phase-dot {
+    width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1.1rem; color: white; position: relative; z-index: 1;
+    box-shadow: 0 0 0 4px #0f172a;
+  }
+  .phase-dot.p1 { background: var(--phase1); }
+  .phase-dot.p2 { background: var(--phase2); }
+  .phase-dot.p3 { background: var(--phase3); }
+  .phase-content { flex: 1; }
+  .phase-header { display: flex; align-items: flex-start; flex-wrap: wrap; gap: .75rem; margin-bottom: 1rem; }
+  .phase-header h3 { font-size: 1.35rem; margin: 0; flex: 1; min-width: 200px; color: white; }
+  .phase-card {
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
+    border-radius: var(--radius); padding: 1.75rem;
+  }
+  .phase-card > p { color: #94a3b8; margin-bottom: 0; }
+  .phase-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.25rem; }
+  @media (max-width: 640px) { .phase-cols { grid-template-columns: 1fr; } }
+  .phase-col-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #64748b; margin-bottom: .6rem; }
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: .45rem; }
+  .check-list li { display: flex; gap: .55rem; font-size: .92rem; color: #94a3b8; }
+  .check-list li::before { content: '\2713'; color: #4ade80; font-weight: 700; flex-shrink: 0; }
+  .check-list li strong { color: #e2e8f0; }
+
+  .win-box {
+    margin-top: 1.25rem; padding: 1rem 1.25rem;
+    background: rgba(22,163,74,.12); border: 1px solid rgba(74,222,128,.2);
+    border-radius: 8px;
+  }
+  .win-box-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #4ade80; margin-bottom: .4rem; }
+  .win-box p { color: #86efac; font-size: .92rem; margin: 0; }
+
+  .scorecard {
+    background: rgba(0,0,0,.3); color: #e2e8f0; border-radius: 8px;
+    padding: 1rem 1.25rem; margin-top: 1.25rem;
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace; font-size: .85rem;
+    line-height: 1.8; border: 1px solid rgba(255,255,255,.08);
+  }
+  .scorecard .label { color: #64748b; }
+  .scorecard .good { color: #4ade80; }
+  .scorecard .warn { color: #fbbf24; }
+
+  /* TIMELINE STRIP */
+  .timeline-strip { display: flex; gap: 0; margin-top: 2rem; border-radius: var(--radius); overflow: hidden; }
+  .tstrip { flex: 1; padding: .75rem 1rem; font-size: .82rem; font-weight: 600; display: flex; flex-direction: column; gap: .2rem; }
+  .tstrip .ts-phase { font-size: .68rem; opacity: .7; text-transform: uppercase; letter-spacing: .06em; }
+  .t1 { background: var(--phase1); color: white; }
+  .t2 { background: var(--phase2); color: white; }
+  .t3 { background: var(--phase3); color: white; }
+
+  /* FAQ */
+  .faq-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 2.5rem; }
+  .faq-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
+  .faq-item h4 { font-size: 1rem; margin-bottom: .6rem; }
+  .faq-item p { font-size: .92rem; }
+
+  /* TO GET STARTED */
+  .start-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 2rem; }
+  .start-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); }
+  .start-card .start-icon { font-size: 1.75rem; margin-bottom: .5rem; }
+  .start-card h4 { font-size: .95rem; margin-bottom: .3rem; }
+  .start-card p { font-size: .87rem; }
+
+  /* NEXT STEPS */
+  .next-bg { background: linear-gradient(135deg, #0f172a, #1e3a8a); padding: 5rem 0; }
+  .next-inner { max-width: 820px; margin: 0 auto; text-align: center; padding: 0 2rem; color: white; }
+  .next-inner h2 { color: white; margin-bottom: 1rem; }
+  .next-inner > p { color: #94a3b8; margin-bottom: 2.5rem; }
+  .next-steps-list { display: flex; flex-direction: column; gap: 1rem; text-align: left; }
+  .next-step { display: flex; gap: 1rem; align-items: flex-start; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: var(--radius); padding: 1.25rem; }
+  .next-step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-mid); color: white; font-weight: 700; font-size: .9rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .next-step div h4 { color: white; font-size: .95rem; margin-bottom: .25rem; }
+  .next-step div p { color: #94a3b8; font-size: .88rem; margin: 0; }
+
+  /* SECTION HEADERS */
+  .section-tag { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); margin-bottom: .75rem; }
+  .section-header { margin-bottom: .5rem; }
+  .section-sub { font-size: 1.1rem; max-width: 640px; margin-top: .75rem; }
+
+  .cat-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2.5rem; }
+  @media (max-width: 900px) { .cat-steps { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .cat-steps { grid-template-columns: 1fr; } }
+  .cat-step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.4rem; box-shadow: var(--shadow);
+    position: relative;
+  }
+  .cat-num {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--accent);
+    color: white; font-weight: 800; font-size: .9rem;
+    display: flex; align-items: center; justify-content: center; margin-bottom: .75rem;
+  }
+  .cat-step h3 { font-size: 1rem; margin-bottom: .4rem; }
+  .cat-step p { font-size: .87rem; }
+  .cat-note {
+    margin-top: 1.5rem; background: var(--accent-light); border: 1px solid #bfdbfe;
+    border-radius: var(--radius); padding: 1.25rem 1.4rem;
+  }
+  .cat-note h4 { font-size: .95rem; margin-bottom: .4rem; color: var(--accent); }
+  .cat-note p { font-size: .9rem; color: var(--text); }
+
+  /* DATA PROTECTION */
+  .dp-places { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2.5rem; }
+  @media (max-width: 800px) { .dp-places { grid-template-columns: 1fr; } }
+  .dp-place {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.4rem; box-shadow: var(--shadow);
+  }
+  .dp-place .dp-k { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: .4rem; }
+  .dp-place h3 { font-size: 1rem; margin-bottom: .4rem; }
+  .dp-place p { font-size: .88rem; }
+  .dp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+  .dp-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.35rem; box-shadow: var(--shadow); }
+  .dp-card h4 { font-size: .95rem; margin-bottom: .4rem; }
+  .dp-card p { font-size: .87rem; }
+  .dp-keep {
+    margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  }
+  @media (max-width: 700px) { .dp-keep { grid-template-columns: 1fr; } }
+  .dp-keep-col { border-radius: var(--radius); padding: 1.4rem; }
+  .dp-keep-col.keep { background: var(--green-light); border: 1px solid #bbf7d0; }
+  .dp-keep-col.drop { background: var(--amber-light); border: 1px solid #fde68a; }
+  .dp-keep-col h4 { font-size: .95rem; margin-bottom: .6rem; }
+  .dp-keep-col ul { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: .88rem; }
+  .dp-keep-col li { margin-bottom: .35rem; }
+  .dp-mock {
+    margin-top: 2rem; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .dp-mock-head {
+    background: #0f172a; color: #94a3b8; padding: .7rem 1.1rem; font-size: .8rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .dp-mock-head strong { color: white; font-size: .88rem; }
+  .dp-row {
+    display: grid; grid-template-columns: 1.4fr .7fr .8fr .9fr auto;
+    gap: .75rem; padding: .7rem 1.1rem; font-size: .82rem; border-top: 1px solid var(--border);
+    align-items: center;
+  }
+  @media (max-width: 700px) { .dp-row { grid-template-columns: 1fr; } }
+  .dp-row.head { background: var(--surface2); font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .dp-del { background: white; border: 1px solid #fecaca; color: #b91c1c; border-radius: 6px; padding: .25rem .55rem; font-size: .75rem; font-weight: 600; }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  @media (max-width: 600px) {
+    .hero-stats { gap: 1.25rem; }
+    .nav-links { display: none; }
+    .timeline-strip { flex-direction: column; }
+    .phase-timeline::before { left: 20px; }
+    .phase-dot { width: 40px; height: 40px; font-size: .9rem; }
+    .ui-body { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">MA Associates · AI Accountant</div>
+  <div class="nav-links">
+    <a href="#how-it-works">How it works</a>
+    <a href="#categorisation">Categorisation</a>
+    <a href="#the-interface">The interface</a>
+    <a href="#phases">Phases</a>
+    <a href="#data-protection">Data protection</a>
+    <a href="#faq">FAQ</a>
+    <a href="#next-steps">Get started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#93c5fd" stroke-width="1.5"/><circle cx="6" cy="6" r="2" fill="#93c5fd"/></svg>
+      Proposal · August 2026
+    </div>
+    <h1>An <span>AI junior accountant</span> built into the MA Associates dashboard</h1>
+    <p class="hero-sub">
+      A three-phase plan to automate routine bookkeeping and accounts preparation, starting with
+      <strong>bank statements in, trial balance out</strong>, while keeping a qualified accountant in control of every final decision.
+    </p>
+
+    <div class="timeline-strip">
+      <div class="tstrip t1"><span class="ts-phase">Phase 1</span>Bank to trial balance · learning phase</div>
+      <div class="tstrip t2"><span class="ts-phase">Phase 2</span>Documents, FreeAgent, learning</div>
+      <div class="tstrip t3"><span class="ts-phase">Phase 3</span>Full pipeline + MTD</div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">90%+</span><span class="stat-label">Transaction accuracy target before you rely on it</span></div>
+      <div class="stat"><span class="stat-num">3</span><span class="stat-label">Phases · each one builds on the last</span></div>
+      <div class="stat"><span class="stat-num">0</span><span class="stat-label">Autonomous submissions · human approves everything</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRINCIPLES -->
+<section id="how-it-works">
+  <p class="section-tag">How it works</p>
+  <h2 class="section-header">Three things that keep this reliable</h2>
+  <p class="section-sub">The accounting process stays in control. The AI does the heavy lifting inside each step. It is not the source of truth.</p>
+
+  <div class="principles-grid">
+    <div class="principle-card">
+      <div class="principle-icon">⚙️</div>
+      <h3>Code handles anything with a definite answer</h3>
+      <p>Do debits equal credits? Is the client VAT registered? Does this account already exist? Software checks these every time. They are never sent to an AI.</p>
+    </div>
+    <div class="principle-card">
+      <div class="principle-icon">🧠</div>
+      <h3>AI handles genuine judgement calls only</h3>
+      <p>Which account does this Stripe payment belong to? Is this a capital or revenue expense? The AI reasons using MA's own rules, last year's file, and each client's historical decisions, not generic internet knowledge.</p>
+    </div>
+    <div class="principle-card">
+      <div class="principle-icon">👤</div>
+      <h3>A qualified accountant approves everything that matters</h3>
+      <p>Bank rec and trial balance are finished before sign-off. Uncertain lines wait in a table with a real question. Nothing goes to HMRC or Companies House without a person.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- CATEGORISATION -->
+<section id="categorisation">
+  <p class="section-tag">Phase 1 · the hard problem</p>
+  <h2 class="section-header">How we categorise each bank line, and how we keep it honest</h2>
+  <p class="section-sub">This is the core of Phase 1. The AI does not guess a category and hope. Every line goes through a fixed order. Earlier steps win. If it is not sure, it asks you a real question. We score this every week against jobs you have already completed.</p>
+
+  <div class="cat-steps">
+    <div class="cat-step">
+      <div class="cat-num">1</div>
+      <h3>Known mapping first</h3>
+      <p>Has this supplier or description already been coded for this client? If yes, use that. No AI involved. Amazon for this client is Stationery because you said so last year.</p>
+    </div>
+    <div class="cat-step">
+      <div class="cat-num">2</div>
+      <h3>Firm rules second</h3>
+      <p>If there is no client mapping, check MA's approved rules. VAT codes, P&amp;L vs balance sheet, "create a new account when...". Code answers these. The model does not.</p>
+    </div>
+    <div class="cat-step">
+      <div class="cat-num">3</div>
+      <h3>AI only when those miss</h3>
+      <p>Then, and only then, the AI proposes an account and VAT code. It sees the client's trade, last year's file, and HMRC's allowable expense list. Most lines sit on that list. The hard call is personal vs business, not "is this stationery."</p>
+    </div>
+    <div class="cat-step">
+      <div class="cat-num">4</div>
+      <h3>Ask. Never silent-guess</h3>
+      <p>Low confidence, or a line that does not fit the business (Emirates on a car-wash client), goes to you with a specific question. Your answer can become a standing rule for that client. Guessing is not allowed.</p>
+    </div>
+  </div>
+
+  <div class="cat-note">
+    <h4>How we know it is actually getting it right</h4>
+    <p>Every week we run this against a real MA job you already finished, without showing the AI your answer. Each line is scored. Target is 90%+. The rest must be flagged with a question, not posted wrong. After that, software still checks trial balance and bank rec before sign-off.</p>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- THE INTERFACE -->
+<section id="the-interface" class="ui-section" style="max-width:100%;padding:5rem 2rem;background:var(--surface2);">
+  <div style="max-width:1100px;margin:0 auto;">
+    <p class="section-tag">Where your team interacts with it</p>
+    <h2 class="section-header">It lives inside the MA Associates dashboard</h2>
+    <p class="section-sub">No separate app. Chat starts a job. Flagged lines get a table. Email plus a badge when it needs you.</p>
+
+    <div class="flow-strip">
+      <div class="flow-step"><div class="flow-n">1</div><strong>Drop the files</strong><span>OneDrive Agent folder, or upload in MA</span></div>
+      <div class="flow-step"><div class="flow-n">2</div><strong>It works in the background</strong><span>Status: Processing. You can leave.</span></div>
+      <div class="flow-step"><div class="flow-n">3</div><strong>You get pinged</strong><span>Email + badge: Needs your input, or Ready</span></div>
+      <div class="flow-step"><div class="flow-n">4</div><strong>Answer the table</strong><span>One click per flagged line. Not in chat.</span></div>
+      <div class="flow-step"><div class="flow-n">5</div><strong>Download the files</strong><span>MA Excel template + one-page PDF</span></div>
+    </div>
+    <p style="font-size:.82rem;color:var(--muted);margin-top:.6rem;">Every job sits in one of five states: Queued · Processing · Needs your input · Ready for review · Approved.</p>
+
+    <!-- MOCKUP -->
+    <div class="ui-mockup">
+      <div class="ui-topbar">
+        <div class="ui-dot" style="background:#ef4444"></div>
+        <div class="ui-dot" style="background:#f59e0b"></div>
+        <div class="ui-dot" style="background:#22c55e"></div>
+        <span class="ui-topbar-label">MA Associates · AI Accountant</span>
+      </div>
+      <div class="ui-body">
+        <!-- SIDEBAR -->
+        <div class="ui-sidebar">
+          <div class="ui-sidebar-label">Navigation</div>
+          <div class="ui-nav-item">Dashboard</div>
+          <div class="ui-nav-item">WIP Jobs</div>
+          <div class="ui-nav-item">Clients</div>
+          <div class="ui-nav-item active">AI Accountant</div>
+          <div class="ui-nav-item">Reports</div>
+          <div style="margin-top:1.5rem;">
+            <div class="ui-sidebar-label">Active AI Jobs</div>
+            <div style="font-size:.8rem;color:var(--muted);padding:.4rem .5rem;border-radius:6px;background:white;border:1px solid var(--border);margin-bottom:.4rem;">
+              <div style="font-weight:600;color:var(--text);font-size:.82rem;">ABC Limited</div>
+              <div style="color:#1d4ed8;font-size:.75rem;">Processing</div>
+            </div>
+            <div style="font-size:.8rem;color:var(--muted);padding:.4rem .5rem;border-radius:6px;background:white;border:1px solid var(--border);margin-bottom:.4rem;">
+              <div style="font-weight:600;color:var(--text);font-size:.82rem;">XYZ Trading Ltd</div>
+              <div style="color:#d97706;font-size:.75rem;">Needs your input · 12 exceptions</div>
+            </div>
+            <div style="font-size:.8rem;color:var(--muted);padding:.4rem .5rem;border-radius:6px;background:white;border:1px solid var(--border);">
+              <div style="font-weight:600;color:var(--text);font-size:.82rem;">Kaliki Ltd</div>
+              <div style="color:#7c3aed;font-size:.75rem;">Ready for review</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN JOB VIEW -->
+        <div class="ui-main">
+          <div class="ui-main-title">ABC Limited · Year End 2024/25</div>
+
+          <!-- PROGRESS BAR -->
+          <div style="margin-bottom:1rem;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;">
+              <span style="font-size:.78rem;color:var(--muted);">Progress</span>
+              <span style="font-size:.78rem;font-weight:600;color:var(--accent);">Processing · categorising</span>
+            </div>
+            <div style="background:var(--border);border-radius:100px;height:6px;">
+              <div style="background:var(--accent);width:48%;height:6px;border-radius:100px;"></div>
+            </div>
+          </div>
+
+          <!-- TRANSACTION ROWS -->
+          <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:.82rem;">
+            <div style="background:var(--surface2);padding:.5rem .75rem;display:grid;grid-template-columns:1fr 80px 120px 80px;gap:.5rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);">
+              <div>Description</div><div>Amount</div><div>Account</div><div>Confidence</div>
+            </div>
+            <div style="padding:.55rem .75rem;display:grid;grid-template-columns:1fr 80px 120px 80px;gap:.5rem;border-top:1px solid var(--border);color:var(--text);">
+              <div>AMAZON UK MARKETPLACE</div><div style="color:var(--muted);">£84.99</div><div style="color:var(--green);font-weight:600;">Stationery</div><div><span style="background:#dcfce7;color:#16a34a;padding:.1rem .4rem;border-radius:4px;font-weight:700;font-size:.75rem;">94%</span></div>
+            </div>
+            <div style="padding:.55rem .75rem;display:grid;grid-template-columns:1fr 80px 120px 80px;gap:.5rem;border-top:1px solid var(--border);color:var(--text);">
+              <div>DELL TECHNOLOGIES UK</div><div style="color:var(--muted);">£1,284.00</div><div style="color:var(--green);font-weight:600;">Computer Equip</div><div><span style="background:#dcfce7;color:#16a34a;padding:.1rem .4rem;border-radius:4px;font-weight:700;font-size:.75rem;">96%</span></div>
+            </div>
+            <div style="padding:.55rem .75rem;display:grid;grid-template-columns:1fr 80px 120px 80px;gap:.5rem;border-top:1px solid var(--border);background:#fffbeb;color:var(--text);">
+              <div>UNKNOWN TRANSFER REF 7821</div><div style="color:var(--muted);">£420.00</div><div style="color:#d97706;font-weight:600;">Needs review</div><div><span style="background:#fef9c3;color:#854d0e;padding:.1rem .4rem;border-radius:4px;font-weight:700;font-size:.75rem;">38%</span></div>
+            </div>
+          </div>
+
+          <div style="margin-top:.75rem;font-size:.78rem;color:var(--muted);">1,138 of 1,247 transactions categorised · 109 flagged for your review</div>
+        </div>
+
+        <!-- CHAT PANEL -->
+        <div class="ui-chat" style="display:flex;flex-direction:column;gap:.6rem;">
+          <div class="ui-chat-label">AI Assistant · for starting jobs &amp; quick questions</div>
+          <div class="chat-bubble system">Started year-end job for ABC Limited. Ingested 1,247 transactions from the uploaded bank file.</div>
+          <div class="chat-bubble ai">Categorised 1,138 transactions automatically. 109 need your input, mostly transfers and one-off payments I haven't seen before for this client. Open the review table when you're ready, or ask me anything here.</div>
+          <div class="chat-bubble user">What's overdue this week across all clients?</div>
+          <div class="chat-bubble ai">3 jobs: XYZ Trading (VAT due Friday), Kaliki Ltd (needs supporting invoices), Smith &amp; Co (awaiting your sign-off).</div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:.82rem;color:var(--muted);margin-top:.75rem;">Sketch. Click a box below to open that screen.</p>
+
+    <h3 style="margin:2rem 0 .35rem;">Six screens</h3>
+
+    <!-- UI FEATURES -->
+    <div class="ui-features-grid">
+      <a class="ui-feature" href="#modal-chat">
+        <div class="ui-feature-icon">💬</div>
+        <h4>Chat to start a job</h4>
+        <p>Type "Start year-end for ABC Ltd." Chat starts work and answers quick questions. Review still happens in the table.</p>
+        <span class="click-hint">Click to see the chat →</span>
+      </a>
+      <a class="ui-feature" href="#modal-review">
+        <div class="ui-feature-icon">📋</div>
+        <h4>Exception table</h4>
+        <p>Uncertain lines land in a table with the actual question. One click to answer. Saved as a client rule if you want.</p>
+        <span class="click-hint">Click to see the table →</span>
+      </a>
+      <a class="ui-feature" href="#modal-notify">
+        <div class="ui-feature-icon">🔔</div>
+        <h4>Email + in-app alert</h4>
+        <p>Drop the files and leave. You get pinged when it needs input, or when it is ready for sign-off.</p>
+        <span class="click-hint">Click to see the alert →</span>
+      </a>
+      <a class="ui-feature" href="#modal-trace">
+        <div class="ui-feature-icon">🔍</div>
+        <h4>Why this line was coded</h4>
+        <p>Click any transaction. See the mapping, the rule, or the AI proposal plus confidence. Nothing is a black box.</p>
+        <span class="click-hint">Click to see the why →</span>
+      </a>
+      <a class="ui-feature" href="#modal-files">
+        <div class="ui-feature-icon">📄</div>
+        <h4>Excel + one-page PDF</h4>
+        <p>Finished job = MA's real working file plus a PDF summary. Both sit on the job page and in the database.</p>
+        <span class="click-hint">Click to see the files →</span>
+      </a>
+      <a class="ui-feature" href="#modal-history">
+        <div class="ui-feature-icon">🗂️</div>
+        <h4>Idea later: per-client history</h4>
+        <p>A client list of every AI run, status, and files. Same building blocks as day one. Not in the first build.</p>
+        <span class="click-hint">Click to see the idea →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="modal-root" id="modal-chat">
+  <a class="modal-scrim" href="#the-interface" aria-label="Close"></a>
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3>Chat to start a job</h3>
+        <p>Start work and ask operational questions here.</p>
+      </div>
+      <a class="modal-x" href="#the-interface" aria-label="Close">×</a>
+    </div>
+    <div class="modal-body">
+      <div class="ui-mockup" style="margin:0;">
+        <div class="ui-topbar">
+          <div class="ui-dot" style="background:#ef4444"></div>
+          <div class="ui-dot" style="background:#f59e0b"></div>
+          <div class="ui-dot" style="background:#22c55e"></div>
+          <span class="ui-topbar-label">MA Associates · AI Accountant · Chat</span>
+        </div>
+        <div style="display:grid;grid-template-columns:200px 1fr;min-height:360px;background:white;">
+          <div class="ui-sidebar">
+            <div class="ui-sidebar-label">Jobs</div>
+            <div style="padding:.5rem .6rem;border-radius:8px;background:var(--accent-light);margin-bottom:.4rem;">
+              <div style="font-weight:600;font-size:.82rem;">ABC Limited</div>
+              <div style="color:#1d4ed8;font-size:.75rem;">Processing</div>
+            </div>
+            <div style="padding:.5rem .6rem;border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:600;font-size:.82rem;">XYZ Trading</div>
+              <div style="color:#d97706;font-size:.75rem;">Needs your input</div>
+            </div>
+          </div>
+          <div class="ui-chat">
+            <div class="chat-bubble user">Start year-end for ABC Ltd. Files are in the Agent folder.</div>
+            <div class="chat-bubble ai">Got it. Job queued. I will ingest the bank file, categorise, then run trial balance and bank rec. You will get an email if anything needs you.</div>
+            <div class="chat-bubble user">What's overdue this week?</div>
+            <div class="chat-bubble ai">3 jobs: XYZ VAT due Friday · Kaliki waiting on invoices · Smith &amp; Co ready for sign-off.</div>
+          </div>
+        </div>
+      </div>
+      <p class="visual-note">Chat starts the job and answers operational questions. Review still happens in the table, not in this thread.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-root" id="modal-review">
+  <a class="modal-scrim" href="#the-interface" aria-label="Close"></a>
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3>Exception table</h3>
+        <p>This is where flagged lines get answered.</p>
+      </div>
+      <a class="modal-x" href="#the-interface" aria-label="Close">×</a>
+    </div>
+    <div class="modal-body">
+      <div class="ui-mockup" style="margin:0;">
+        <div class="ui-topbar">
+          <div class="ui-dot" style="background:#ef4444"></div>
+          <div class="ui-dot" style="background:#f59e0b"></div>
+          <div class="ui-dot" style="background:#22c55e"></div>
+          <span class="ui-topbar-label">XYZ Trading Ltd · Needs your input · 2 of 12 remaining</span>
+        </div>
+        <div style="padding:1.25rem;background:white;overflow-x:auto;">
+          <table class="ex-table">
+            <thead>
+              <tr><th>Description</th><th>Amount</th><th>Why it's flagged</th><th>Your answer</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>UNKNOWN TRANSFER REF 7821</td>
+                <td class="amt">£420.00</td>
+                <td class="why">No prior mapping. Director loan or subcontractor?</td>
+                <td class="act"><div class="act-btns"><button class="btn-pri" type="button">Director Loan</button><button class="btn-sec" type="button">Subcontractor</button></div></td>
+              </tr>
+              <tr>
+                <td>EMIRATES 176-4482910</td>
+                <td class="amt">£612.40</td>
+                <td class="why">Car-wash client. Business travel or personal?</td>
+                <td class="act"><div class="act-btns"><button class="btn-pri" type="button">Business</button><button class="btn-sec" type="button">Personal</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="visual-note">This is the review screen. One click per line. Optional: save as a standing rule for this client.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-root" id="modal-notify">
+  <a class="modal-scrim" href="#the-interface" aria-label="Close"></a>
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3>Email + in-app alert</h3>
+        <p>You do not watch the spinner.</p>
+      </div>
+      <a class="modal-x" href="#the-interface" aria-label="Close">×</a>
+    </div>
+    <div class="modal-body">
+      <div class="modal-split">
+        <div class="ui-mockup" style="margin:0;">
+          <div class="ui-topbar"><span class="ui-topbar-label">Inbox · MA Associates</span></div>
+          <div style="padding:1.1rem;background:white;">
+            <div style="font-size:.72rem;color:var(--muted);margin-bottom:.4rem;">From AI Accountant · just now</div>
+            <div style="font-weight:700;margin-bottom:.35rem;">XYZ Trading Ltd needs your input</div>
+            <p style="font-size:.85rem;margin:0;">12 lines flagged. Largest: Emirates £612.40 · personal vs business. Open the review table when ready.</p>
+          </div>
+        </div>
+        <div class="ui-mockup" style="margin:0;">
+          <div class="ui-topbar"><span class="ui-topbar-label">MA dashboard · nav</span></div>
+          <div style="padding:1.1rem;background:white;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .8rem;background:var(--accent-light);border-radius:8px;font-weight:600;color:var(--accent);">
+              <span>AI Accountant</span>
+              <span style="background:#dc2626;color:white;font-size:.72rem;padding:.15rem .5rem;border-radius:100px;">2</span>
+            </div>
+            <p style="font-size:.82rem;margin:.75rem 0 0;">Red badge = jobs waiting on you. Click through to the table. No need to sit on the page while it runs.</p>
+          </div>
+        </div>
+      </div>
+      <p class="visual-note">Email uses the same Resend setup MA already has. Badge lives on the AI Accountant tab.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-root" id="modal-trace">
+  <a class="modal-scrim" href="#the-interface" aria-label="Close"></a>
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3>Why this line was coded</h3>
+        <p>Click any transaction. See the chain.</p>
+      </div>
+      <a class="modal-x" href="#the-interface" aria-label="Close">×</a>
+    </div>
+    <div class="modal-body">
+      <div class="ui-mockup" style="margin:0;">
+        <div class="ui-topbar"><span class="ui-topbar-label">ABC Limited · AMAZON UK MARKETPLACE · £84.99</span></div>
+        <div style="display:grid;grid-template-columns:1.2fr .8fr;background:white;min-height:280px;">
+          <div style="padding:1.25rem;border-right:1px solid var(--border);">
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.6rem;">Why this coding</div>
+            <div style="padding:.8rem;border:1px solid #bbf7d0;background:var(--green-light);border-radius:8px;margin-bottom:.7rem;">
+              <div style="font-weight:700;color:#166534;">Used prior mapping · no AI needed</div>
+              <div style="font-size:.82rem;color:#166534;margin-top:.25rem;">This client: Amazon UK → Stationery on 14 Jan 2025 (approved by Faraz).</div>
+            </div>
+            <div style="font-size:.82rem;color:var(--muted);">Account 5001 Stationery · VAT T1 · confidence 94% because it is an exact prior match, not a guess.</div>
+          </div>
+          <div style="padding:1.25rem;background:#f8fafc;">
+            <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.6rem;">If it had been unsure</div>
+            <p style="font-size:.85rem;margin:0;">It would not post. It would sit in the exception table with a question, the same way Emirates does for a car-wash client.</p>
+          </div>
+        </div>
+      </div>
+      <p class="visual-note">Every line stores which step of the chain fired: mapping, firm rule, or AI plus a question.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-root" id="modal-files">
+  <a class="modal-scrim" href="#the-interface" aria-label="Close"></a>
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3>Excel + one-page PDF</h3>
+        <p>Both live on the job when it is ready.</p>
+      </div>
+      <a class="modal-x" href="#the-interface" aria-label="Close">×</a>
+    </div>
+    <div class="modal-body">
+      <div class="modal-split">
+        <div class="ui-mockup" style="margin:0;">
+          <div class="ui-topbar"><span class="ui-topbar-label">Working file</span></div>
+          <div style="padding:1.25rem;background:white;">
+            <div style="font-size:2rem;margin-bottom:.4rem;">📗</div>
+            <div style="font-weight:700;">ABC_Limited_YE_2025.xlsx</div>
+            <p style="font-size:.85rem;margin:.4rem 0 0;">MA's real template. Same tabs, formulas, pages-agree-to-TB. Download from the job.</p>
+          </div>
+        </div>
+        <div class="ui-mockup" style="margin:0;">
+          <div class="ui-topbar"><span class="ui-topbar-label">Glance summary</span></div>
+          <div style="padding:1.25rem;background:white;">
+            <div style="font-size:2rem;margin-bottom:.4rem;">📕</div>
+            <div style="font-weight:700;">ABC_Limited_YE_2025_summary.pdf</div>
+            <p style="font-size:.85rem;margin:.4rem 0 0;">One page: 1,247 lines, 91% auto, 109 questions, TB balanced, rec agreed.</p>
+          </div>
+        </div>
+      </div>
+      <p class="visual-note">Both files are stored on the job in the database as well, so the download is not the only copy.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-root" id="modal-history">
+  <a class="modal-scrim" href="#the-interface" aria-label="Close"></a>
+  <div class="modal-card">
+    <div class="modal-head">
+      <div>
+        <h3>Per-client history</h3>
+        <p>An idea for later. Not in the first build.</p>
+      </div>
+      <a class="modal-x" href="#the-interface" aria-label="Close">×</a>
+    </div>
+    <div class="modal-body">
+      <div class="ui-mockup" style="margin:0;">
+        <div class="ui-topbar"><span class="ui-topbar-label">Idea for later · AI job history by client</span></div>
+        <div style="display:grid;grid-template-columns:220px 1fr;min-height:300px;background:white;">
+          <div class="ui-sidebar">
+            <div class="ui-sidebar-label">Clients</div>
+            <div style="padding:.5rem .6rem;border-radius:8px;background:var(--accent-light);font-weight:600;font-size:.85rem;color:var(--accent);">ABC Limited</div>
+            <div style="padding:.5rem .6rem;font-size:.85rem;color:var(--muted);">XYZ Trading Ltd</div>
+            <div style="padding:.5rem .6rem;font-size:.85rem;color:var(--muted);">Kaliki Ltd</div>
+          </div>
+          <div style="padding:1.25rem;">
+            <div style="font-weight:700;margin-bottom:.75rem;">ABC Limited · AI runs</div>
+            <div style="border:1px solid var(--border);border-radius:8px;padding:.8rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;">
+              <div><div style="font-weight:600;font-size:.88rem;">Year end 2024/25</div><div style="font-size:.78rem;color:var(--muted);">Excel + PDF ready</div></div>
+              <span class="ui-status done">Approved</span>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:8px;padding:.8rem;display:flex;justify-content:space-between;align-items:center;">
+              <div><div style="font-weight:600;font-size:.88rem;">VAT Q1 2025</div><div style="font-size:.78rem;color:var(--muted);">12 exceptions open</div></div>
+              <span class="ui-status review">Needs your input</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="visual-note">Same job list as Phase 1, filtered to one client and kept historically. Phase 3, not day one.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="divider" />
+<!-- PHASES -->
+<div class="phases-bg" id="phases">
+  <div class="phases-inner">
+    <p class="section-tag">The build plan</p>
+    <h2 class="section-header">Three phases · each one builds on the last</h2>
+    <p class="section-sub">Bank to trial balance first, scored every week. Then documents. Then the rest of the pipeline. No six-week silence, no one-shot demo.</p>
+
+    <div class="phase-timeline">
+
+      <!-- PHASE 1 -->
+      <div class="phase-row">
+        <div class="phase-dot p1">1</div>
+        <div class="phase-content">
+          <div class="phase-header">
+            <h3>Bank statements to trial balance · learning phase</h3>
+            <span class="pill pill-blue">Sandbox · weekly scorecards</span>
+          </div>
+          <div class="phase-card">
+            <p>Bank in, trial balance out. No invoices yet. Categorisation is the work. Weekly scorecards on real MA jobs. Target 90%+. This is a learning phase, not a stop/go gate.</p>
+
+            <div class="phase-cols">
+              <div>
+                <div class="phase-col-label">What gets built</div>
+                <ul class="check-list">
+                  <li>OneDrive drop zone (copy in, server picks up)</li>
+                  <li>Bank CSV / Excel in, categorisation chain, exception table</li>
+                  <li>Trial balance + bank rec as hard checks</li>
+                  <li>Weekly scorecard on a real MA job</li>
+                  <li>AI Accountant inside the live MA dashboard (chat, status, download)</li>
+                </ul>
+              </div>
+              <div>
+                <div class="phase-col-label">What you walk away with</div>
+                <ul class="check-list">
+                  <li><strong>A weekly scorecard</strong>, not one demo at the end</li>
+                  <li><strong>90%+ target</strong> before you rely on the output</li>
+                  <li><strong>TB balanced / bank rec agreed</strong> (hard checks)</li>
+                  <li><strong>Questions, not silent guesses</strong></li>
+                  <li>Corrections proposed as standing client rules</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="scorecard">
+              <div><span class="label">Job:                 </span>ABC Limited · Year End 2024/25</div>
+              <div><span class="label">Transactions:        </span>1,247</div>
+              <div><span class="label">Auto-classified:     </span><span class="good">1,138  (91.3%)</span></div>
+              <div><span class="label">Exceptions flagged:  </span><span class="warn">109 · sent to review queue</span></div>
+              <div><span class="label">Trial balance:       </span><span class="good">✓ Balanced</span></div>
+              <div><span class="label">Bank reconciliation: </span><span class="good">✓ Agreed</span></div>
+              <div><span class="label">Processing time:     </span><span class="good">11 minutes</span></div>
+            </div>
+            <p style="font-size:.8rem;margin-top:.5rem;color:#64748b">Example layout. Real numbers come from the job we score that week.</p>
+
+            <div class="win-box">
+              <div class="win-box-label">The win at this stage</div>
+              <p>You see the numbers every week on your own data. Weak weeks mean we tune, they do not mean the project stops. Then your team runs it inside MA.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 2 -->
+      <div class="phase-row">
+        <div class="phase-dot p2">2</div>
+        <div class="phase-content">
+          <div class="phase-header">
+            <h3>Documents, invoices and a system that learns</h3>
+            <span class="pill" style="background:rgba(124,58,237,.15);color:#c4b5fd">Substantially more powerful</span>
+          </div>
+          <div class="phase-card">
+            <p>Invoices and documents sit behind each bank line. FreeAgent can feed invoices where the client already uses it (read-only API). Corrections become standing client rules once a senior approves them. Nylon is optional later, only for complex edge cases, not required.</p>
+
+            <div class="phase-cols">
+              <div>
+                <div class="phase-col-label">What gets built</div>
+                <ul class="check-list">
+                  <li>PDF and image ingestion, match invoice to bank line</li>
+                  <li>Net and VAT checked against the actual invoice</li>
+                  <li>Output in MA's real Excel template</li>
+                  <li>Client memory: recurring suppliers, corrections as standing rules</li>
+                  <li>FreeAgent as a read source where the client already uses it</li>
+                </ul>
+              </div>
+              <div>
+                <div class="phase-col-label">What you walk away with</div>
+                <ul class="check-list">
+                  <li><strong>Per transaction:</strong> account, VAT, invoice, confidence</li>
+                  <li>Output matches MA's Excel template</li>
+                  <li>Missing documents surface before anyone asks</li>
+                  <li><strong>Gets better with every job</strong>, only after a senior approves the rule</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="scorecard">
+              <div><span class="label">Transaction:   </span>£1,284.00 · DELL TECHNOLOGIES UK</div>
+              <div><span class="label">Invoice found: </span><span class="good">INV-10428 (uploaded 14 Jan)</span></div>
+              <div><span class="label">Net:           </span>£1,070.00 &nbsp; <span class="label">VAT: </span>£214.00</div>
+              <div><span class="label">Account:       </span><span class="good">7820 · Computer Equipment</span></div>
+              <div><span class="label">VAT code:      </span><span class="good">T1 (Standard rated)</span></div>
+              <div><span class="label">Confidence:    </span><span class="good">96% · invoice verified</span></div>
+            </div>
+
+            <div class="win-box">
+              <div class="win-box-label">The win at this stage</div>
+              <p>Now it reads the evidence behind each bank line, not only the statement. That is when it starts replacing the manual bookkeeping pass, not just assisting it.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 3 -->
+      <div class="phase-row">
+        <div class="phase-dot p3">3</div>
+        <div class="phase-content">
+          <div class="phase-header">
+            <h3>Full accounts pipeline · source to client-ready output</h3>
+            <span class="pill" style="background:rgba(5,150,105,.15);color:#6ee7b7">Full pipeline</span>
+          </div>
+          <div class="phase-card">
+            <p>Year-end, VAT, and personal tax, with a human on final sign-off. MTD is in scope. For many clients that work already happens inside FreeAgent, and FreeAgent's API is read-only, so we will test the route that actually files (including operating the software directly) rather than assuming an API can submit.</p>
+
+            <div class="phase-cols">
+              <div>
+                <div class="phase-col-label">What gets built</div>
+                <ul class="check-list">
+                  <li>Year-end, VAT, and personal tax</li>
+                  <li>Client queries, summaries, deadline alerts</li>
+                  <li>Per-client job history (the later idea, not day one)</li>
+                  <li>MTD filing path, tested rather than assumed</li>
+                </ul>
+              </div>
+              <div>
+                <div class="phase-col-label">What you walk away with</div>
+                <ul class="check-list">
+                  <li>Full job from source to signed-off accounts</li>
+                  <li>Same process for every member of staff</li>
+                  <li><strong>Seniors on judgement</strong>, not routine processing</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="win-box">
+              <div class="win-box-label">The win at this stage</div>
+              <p>Routine work is automated. Seniors spend time where it actually matters. The system sits in how MA operates, not as a side tool.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- DATA PROTECTION -->
+<section id="data-protection">
+  <p class="section-tag">Data protection · ideas to agree</p>
+  <h2 class="section-header">Ideas for how you stay in control of client data</h2>
+  <p class="section-sub">Options to agree, not a locked spec. ACCA firm, GDPR and ICO apply. Nothing here is committed until you say which of these you want in the contract.</p>
+
+  <div class="dp-places">
+    <div class="dp-place">
+      <div class="dp-k">Place 1 · your cloud</div>
+      <h3>OneDrive drop zone</h3>
+      <p>Copy into the Agent folder on SharePoint. Our server copies it in. Not a live mount the AI can browse.</p>
+    </div>
+    <div class="dp-place">
+      <div class="dp-k">Place 2 · idea</div>
+      <h3>A Data Centre inside the MA dashboard</h3>
+      <p>Parsed jobs, files, and approved mappings in MA's existing database. You see what is held, per client, without a raw database console.</p>
+    </div>
+    <div class="dp-place">
+      <div class="dp-k">Place 3 · idea</div>
+      <h3>Business APIs with zero retention</h3>
+      <p>Claude and OpenAI business APIs only, not free ChatGPT. Zero-retention details below.</p>
+    </div>
+  </div>
+
+  <div class="dp-mock">
+    <div class="dp-mock-head">
+      <strong>Sketch · Data Centre in the MA dashboard</strong>
+      <span>Only if you want this built</span>
+    </div>
+    <div class="dp-row head">
+      <div>Item</div><div>Client</div><div>Type</div><div>Status</div><div></div>
+    </div>
+    <div class="dp-row">
+      <div>bank_export_2024.csv</div>
+      <div>ABC Limited</div>
+      <div>Raw file</div>
+      <div>Can delete after sign-off</div>
+      <button class="dp-del">Delete</button>
+    </div>
+    <div class="dp-row">
+      <div>1,247 parsed transactions</div>
+      <div>ABC Limited</div>
+      <div>Working data</div>
+      <div>Kept while the job exists</div>
+      <button class="dp-del">Delete job</button>
+    </div>
+    <div class="dp-row">
+      <div>Amazon UK → Stationery</div>
+      <div>ABC Limited</div>
+      <div>Approved mapping</div>
+      <div>Kept (this is the learning)</div>
+      <button class="dp-del">Remove rule</button>
+    </div>
+  </div>
+  <p style="font-size:.8rem;color:var(--muted);margin-top:.6rem;">One possible layout. We only build this if you want it.</p>
+
+  <div class="dp-grid">
+    <div class="dp-card">
+      <h4>Zero retention, in writing</h4>
+      <p>Business APIs only, not free ChatGPT. Zero-retention switched on so prompts are not stored after the call. Contract can name the providers if you want that.</p>
+    </div>
+    <div class="dp-card">
+      <h4>Access and leftover copies</h4>
+      <p>MFA on the database. No standing developer access to client files. No leftover copies on laptops or in personal chat apps once that piece of work is done.</p>
+    </div>
+    <div class="dp-card">
+      <h4>GDPR roles</h4>
+      <p>MA stays the data controller. The build team would be a processor. NDA plus a data processing addendum can sit with the contract. You say how far that is written down.</p>
+    </div>
+  </div>
+
+  <div class="dp-keep">
+    <div class="dp-keep-col drop">
+      <h4>Raw files can go after the job</h4>
+      <ul>
+        <li>Original bank CSVs and PDFs deleted after sign-off.</li>
+        <li>One option: 30 days unless you click Keep. You pick the period.</li>
+      </ul>
+    </div>
+    <div class="dp-keep-col keep">
+      <h4>What would stay</h4>
+      <ul>
+        <li>Approved mappings and client rules (the learning).</li>
+        <li>The signed-off file and why each line was coded.</li>
+        <li>Chart of accounts, VAT codes, firm SOPs.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- FAQ -->
+<section id="faq">
+  <p class="section-tag">Common questions</p>
+  <h2 class="section-header">What you're probably wondering</h2>
+
+  <div class="faq-list">
+    <div class="faq-item">
+      <h4>What if the AI gets it wrong?</h4>
+      <p>Uncertain lines go to the exception table with a real question, not a silent guess. Trial balance and bank rec are checked by software before you are asked to sign off. Nothing goes to HMRC or Companies House without a qualified accountant.</p>
+    </div>
+    <div class="faq-item">
+      <h4>Does it replace the accountants?</h4>
+      <p>No. It does the routine bookkeeping pass so your team spends time on judgement, queries, and sign-off. Headcount is not the goal. Submissions stay human-approved.</p>
+    </div>
+    <div class="faq-item">
+      <h4>Is client data secure?</h4>
+      <p>See Data protection. Ideas to agree, not a locked spec. Direction: MA's database, optional Data Centre, business APIs with zero retention, MFA, and a choice on how long raw files are kept.</p>
+    </div>
+    <div class="faq-item">
+      <h4>Is this only bookkeeping, or a general MA assistant?</h4>
+      <p>Phase 1 is accounting jobs only: bank to trial balance. A wider MA chatbot is a later choice, not mixed into the first build.</p>
+    </div>
+    <div class="faq-item">
+      <h4>Can it do VAT, personal tax, and MTD?</h4>
+      <p>Not in Phase 1. Phase 1 is bank to trial balance. Documents and FreeAgent (read) in Phase 2. VAT, personal tax, and MTD in Phase 3. We will test how MTD actually files, because FreeAgent's API cannot submit.</p>
+    </div>
+    <div class="faq-item">
+      <h4>What if the person who built this is unavailable?</h4>
+      <p>Three backups, written into the contract: MA gets the code and hosting; a knowledge-transfer session if Faraz hands over to Qasim; a named developer as ongoing contact, not only one person.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- TO GET STARTED -->
+<section>
+  <p class="section-tag">To get started</p>
+  <h2 class="section-header">What we need from your side</h2>
+    <p class="section-sub">Very little. Real MA files, so we test on your work, not fake data.</p>
+
+  <div class="start-grid">
+    <div class="start-card">
+      <div class="start-icon">📂</div>
+      <h4>A completed historical job</h4>
+      <p>Raw bank file, last year's file if you have it, and the final workbook. An in-progress job helps too. NDA first.</p>
+    </div>
+    <div class="start-card">
+      <div class="start-icon">📁</div>
+      <h4>The Agent drop zone on OneDrive</h4>
+      <p>One shared folder, one subfolder per client and job. You copy files in. Our server copies them onto the job.</p>
+    </div>
+    <div class="start-card">
+      <div class="start-icon">📊</div>
+      <h4>Chart of accounts and VAT codes</h4>
+      <p>The codes MA actually uses. Your Excel template is enough. No formal document needed.</p>
+    </div>
+    <div class="start-card">
+      <div class="start-icon">🗓️</div>
+      <h4>One job walkthrough, then a weekly call</h4>
+      <p>Qasim walks through one job once. Then a short weekly call on the scorecard. Same time each week.</p>
+    </div>
+  </div>
+</section>
+
+<!-- NEXT STEPS -->
+<div class="next-bg" id="next-steps">
+  <div class="next-inner">
+    <p class="section-tag" style="color:#93c5fd">What Phase 1 looks like</p>
+    <h2>Here's exactly what happens first</h2>
+    <p>NDA and one real job first. Then weekly scorecards. Then the same engine inside MA.</p>
+
+    <div class="next-steps-list">
+      <div class="next-step">
+        <div class="next-step-num">1</div>
+        <div>
+          <h4>NDA, drop zone, one completed job</h4>
+          <p>Shared Agent folder. Raw bank file plus your final workbook. Qasim walks through that job once.</p>
+        </div>
+      </div>
+      <div class="next-step">
+        <div class="next-step-num">2</div>
+        <div>
+          <h4>Weekly scorecard</h4>
+          <p>% matched, questions asked, TB yes/no, bank rec yes/no. Target 90%+. Tune, repeat.</p>
+        </div>
+      </div>
+      <div class="next-step">
+        <div class="next-step-num">3</div>
+        <div>
+          <h4>Live inside the MA dashboard</h4>
+          <p>Chat, exception table, Excel + PDF. Your team runs jobs without a developer in the loop.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer style="background:#0f172a;color:#475569;text-align:center;padding:2rem;font-size:.85rem;">
+  MA Associates · AI Accounting System &nbsp;·&nbsp; Confidential proposal &nbsp;·&nbsp; August 2026
+</footer>
+
+</body>
+</html>

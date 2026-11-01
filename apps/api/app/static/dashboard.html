@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bridgit</title>
+  <style>
+    :root {
+      --navy: #0f1c2e;
+      --navy-2: #17304a;
+      --gold: #c8a84b;
+      --paper: #f4efe4;
+      --ink: #1a1a1a;
+      --muted: #5c6570;
+      --live: #2f7d4a;
+      --blocked: #a65b2e;
+      --next: #4a5d78;
+      --line: #d9d1c3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+    header {
+      background: var(--navy);
+      color: #fff;
+      padding: 22px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    header .eyebrow { color: var(--gold); letter-spacing: 0.14em; font-size: 11px; font-weight: 700; }
+    header h1 { margin: 6px 0 6px; font-size: 24px; font-weight: 600; }
+    header p { margin: 0; color: #c5cdd6; font-size: 14px; max-width: 640px; line-height: 1.5; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      background: var(--navy-2);
+      border: 1px solid #2c4663;
+      color: #e8eef5;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+    .chip strong { color: var(--gold); }
+    main { padding: 24px 28px 56px; max-width: 1180px; margin: 0 auto; }
+    h2 { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--navy); margin: 0 0 12px; }
+    .grid { display: grid; grid-template-columns: 1.35fr 0.65fr; gap: 20px; }
+    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .intro {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: #3d4650;
+    }
+    .intro strong { color: var(--ink); }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+      gap: 10px;
+    }
+    .stage {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      background: #fbfaf7;
+      color: var(--ink);
+      text-align: left;
+      font: inherit;
+      min-height: 118px;
+    }
+    .stage:hover, .stage.active { border-color: var(--gold); background: #fff; }
+    .stage .name { font-weight: 650; font-size: 13px; color: var(--navy); line-height: 1.3; }
+    .stage .hint { margin: 6px 0 0; font-size: 12px; color: var(--muted); line-height: 1.4; }
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .live { background: #e5f4ea; color: #1e5c32; }
+    .blocked { background: #f8e8dc; color: #8a4518; }
+    .next { background: #e8eef5; color: #2d4058; }
+    .hint-click { margin: 12px 0 0; font-size: 12px; color: var(--muted); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+    tr[data-id] { cursor: pointer; }
+    tr[data-id]:hover { background: #fbfaf7; }
+    .btn, #run-btn {
+      background: var(--navy);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn.secondary {
+      background: #fff;
+      color: var(--navy);
+      border: 1px solid var(--navy);
+    }
+    #run-btn:disabled { opacity: 0.5; cursor: wait; }
+    input, select {
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: inherit;
+      color: var(--ink);
+      background: #fff;
+    }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+    .status-queued { color: #4a5d78; }
+    .status-processing { color: #a65b2e; }
+    .status-needs_input { color: #a65b2e; }
+    .status-ready_for_review { color: var(--live); }
+    .status-approved { color: var(--live); font-weight: 700; }
+    .muted { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    #job-panel { margin-top: 16px; }
+    .exc { background: #fff8f2; }
+    .exc-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 10px 0;
+      background: #fff8f2;
+    }
+    .exc-card.duplicate { background: #f4f7fb; }
+    .exc-meta { font-size: 12px; color: var(--muted); margin: 4px 0 8px; }
+    .exc-q { font-size: 14px; margin: 0 0 10px; }
+    .exc-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .btn.gold { background: #2f7d4a; }
+    .btn.warn { background: #a65b2e; }
+    .ready-banner {
+      background: #e5f4ea;
+      border: 1px solid #9dcca8;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 12px 0;
+    }
+    .err { color: #8a4518; font-size: 12px; margin-top: 6px; min-height: 16px; }
+    dialog {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0;
+      max-width: 520px;
+      width: calc(100% - 32px);
+      color: var(--ink);
+      box-shadow: 0 16px 40px rgba(15, 28, 46, 0.18);
+    }
+    dialog::backdrop { background: rgba(15, 28, 46, 0.45); }
+    .modal-body { padding: 20px 22px 22px; }
+    .modal-body h3 { margin: 0 0 8px; font-size: 18px; color: var(--navy); }
+    .modal-body p { margin: 0 0 10px; font-size: 14px; line-height: 1.55; color: #3d4650; }
+    .modal-actions { display: flex; justify-content: flex-end; padding: 0 22px 18px; }
+    label.field { display: block; font-size: 11px; font-weight: 650; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 8px 0 4px; }
+    input[name="title"], input[name="client_name"] { min-width: 200px; flex: 1; }
+    #board-gate {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 28, 46, 0.92);
+      z-index: 80;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #board-gate.open { display: flex; }
+    #board-gate .card { max-width: 400px; width: 100%; }
+  </style>
+</head>
+<body>
+  <div id="board-gate">
+    <div class="card">
+      <p class="eyebrow" style="color:var(--gold);letter-spacing:0.14em;font-size:11px;font-weight:700">BRIDGIT</p>
+      <h2 style="text-transform:none;letter-spacing:0;font-size:20px;margin-top:8px">Team password</h2>
+      <p class="muted">Required when BRIDGIT_PASSWORD is set on the server.</p>
+      <label class="field">Password</label>
+      <input id="board-pw" type="password" style="width:100%;padding:8px" />
+      <p class="err" id="board-pw-err"></p>
+      <div class="row" style="margin-top:12px">
+        <button class="btn gold" type="button" id="board-pw-btn">Continue</button>
+      </div>
+    </div>
+  </div>
+  <header>
+    <div>
+      <div class="eyebrow">BRIDGIT · MA ASSOCIATES</div>
+      <h1>AI bookkeeping assistant</h1>
+      <p>Bank statement in. Lines coded from this client's history. Anything unsure comes back as a question. The working Excel is written in your existing format, ready for a human to review. Nothing is filed. Faraz uses <a href="/app" style="color:#c8a84b">/app</a>. This page is the internal board.</p>
+    </div>
+    <div class="chips" id="chips">
+      <div class="chip">loading…</div>
+    </div>
+  </header>
+  <main>
+    <div class="intro">
+      <strong>How a job runs.</strong>
+      Upload a bank file → Bridgit codes known lines automatically → it asks about anything new, personal, or duplicated → answers are saved for next time → you download the working Excel and a one-page summary.
+      The questions below are for an accountant. Do not Accept or Override unless you are coding the job.
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>How Bridgit works</h2>
+        <div class="flow" id="flow"></div>
+        <p class="hint-click">Click a step for a short explanation.</p>
+      </section>
+      <section class="card">
+        <h2>Start a job</h2>
+        <p class="muted">Upload a bank PDF, CSV, or Excel. A sample file is included if you only want to see the flow.</p>
+        <div class="row">
+          <a class="btn secondary" href="/static/sample-bank.csv" download>Download sample CSV</a>
+        </div>
+        <form id="run-form">
+          <label class="field">Job title</label>
+          <div class="row">
+            <input name="title" value="August 2026 bank" />
+          </div>
+          <label class="field">Client</label>
+          <div class="row">
+            <input name="client_name" value="Koliqi &amp; Sons Developments Ltd" />
+          </div>
+          <label class="field">Job type</label>
+          <div class="row">
+            <select name="job_type" id="job-type" required>
+              <option value="" selected disabled>Choose job type…</option>
+              <option value="company_accounts">Company Accounts (year-end)</option>
+              <option value="vat_return">VAT Return</option>
+              <option value="property_lettings">Property Lettings</option>
+              <option value="sole_trader">Sole Trader / Self Employed</option>
+              <option value="cis_accounts">CIS Accounts</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <label class="field">Period start / end</label>
+          <div class="row">
+            <input type="date" name="period_start" />
+            <input type="date" name="period_end" />
+          </div>
+          <label class="field">Bank file</label>
+          <div class="row">
+            <input type="file" name="bank_file" accept=".csv,.xlsx,.xlsm,.pdf" />
+          </div>
+          <label class="field">Last year / comparative file (year-end)</label>
+          <div class="row">
+            <input type="file" name="comparative_file" accept=".xlsx,.xlsm" />
+            <button type="submit" id="run-btn">Upload and process</button>
+          </div>
+          <p class="muted">Bridgit will list missing papers as questions. It will not refuse to start if a file is late.</p>
+        </form>
+        <p class="muted" id="run-msg"></p>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top: 20px">
+      <h2>Jobs</h2>
+      <p class="muted">Click a job to see coded lines and any questions waiting for an accountant.</p>
+      <table>
+        <thead>
+          <tr><th>Status</th><th>Title</th><th>Client</th><th>Type</th><th>Created</th></tr>
+        </thead>
+        <tbody id="jobs"></tbody>
+      </table>
+      <div id="job-panel"></div>
+    </section>
+  </main>
+
+  <dialog id="stage-modal">
+    <div class="modal-body">
+      <div class="badge" id="modal-badge"></div>
+      <h3 id="modal-title"></h3>
+      <p id="modal-does"></p>
+      <p id="modal-not" class="muted"></p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" type="button" id="modal-close">Close</button>
+    </div>
+  </dialog>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const STATUS_LABEL = {
+      queued: "Waiting",
+      processing: "Processing",
+      needs_input: "Needs your input",
+      ready_for_review: "Ready for review",
+      approved: "Approved",
+      live: "Live",
+      blocked: "Waiting",
+      next: "Next",
+    };
+    const KIND_LABEL = {
+      duplicate: "Possible duplicate",
+      mapping_review: "Needs confirmation",
+      llm: "AI suggestion",
+      unknown: "Needs a decision",
+      missing_document: "Missing document",
+    };
+    const SOURCE_LABEL = { mapping: "Saved coding", llm: "AI", human: "Human", firm_rule: "Firm rule" };
+
+    function labelStatus(s) { return STATUS_LABEL[s] || s; }
+    function chipLlm(v) {
+      if (v === "anthropic-on") return "On";
+      if (v === "off") return "Off";
+      return v || "-";
+    }
+
+    function jobsFetch(path, opts = {}) {
+      return fetch(path, { credentials: "same-origin", ...opts }).then(async (res) => {
+        if (res.status !== 401) return res;
+        const ok = await promptBoardPassword();
+        if (!ok) throw new Error("unauthorized");
+        return fetch(path, { credentials: "same-origin", ...opts });
+      });
+    }
+
+    function promptBoardPassword() {
+      const gate = $("board-gate");
+      gate.classList.add("open");
+      $("board-pw").focus();
+      return new Promise((resolve) => {
+        const submit = async () => {
+          $("board-pw-err").textContent = "Checking…";
+          try {
+            const data = await fetch("/meta/password-check", {
+              method: "POST",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ pw: $("board-pw").value }),
+            }).then(r => r.json());
+            if (data.warning === "no_password_configured") {
+              $("board-pw-err").textContent = "No password set on server.";
+              resolve(false);
+              return;
+            }
+            if (!data.ok) {
+              $("board-pw-err").textContent = "Wrong password.";
+              return;
+            }
+            gate.classList.remove("open");
+            resolve(true);
+          } catch (e) {
+            $("board-pw-err").textContent = String(e.message || e);
+            resolve(false);
+          }
+        };
+        $("board-pw-btn").onclick = submit;
+        $("board-pw").onkeydown = (e) => { if (e.key === "Enter") submit(); };
+      });
+    }
+
+    async function loadHealth() {
+      const h = await fetch("/health").then(r => r.json());
+      $("chips").innerHTML = `
+        <div class="chip">Database <strong>${h.database === "up" ? "connected" : "down"}</strong></div>
+        <div class="chip">Engine <strong>${h.ok ? "ready" : "not ready"}</strong></div>
+        <div class="chip">AI <strong>${chipLlm(h.llm)}</strong></div>
+      `;
+    }
+
+    let stages = [];
+    async function loadPipeline() {
+      const data = await fetch("/pipeline").then(r => r.json());
+      stages = data.stages;
+      $("flow").innerHTML = stages.map((s, i) => `
+        <button class="stage" data-i="${i}" type="button">
+          <div class="badge ${s.status}">${labelStatus(s.status)}</div>
+          <div class="name">${s.title}</div>
+          <p class="hint">${s.meaning || ""}</p>
+        </button>
+      `).join("");
+      $("flow").querySelectorAll(".stage").forEach(el => {
+        el.addEventListener("click", () => openStage(Number(el.dataset.i)));
+      });
+    }
+
+    function openStage(i) {
+      const s = stages[i];
+      document.querySelectorAll(".stage").forEach((el, idx) => el.classList.toggle("active", idx === i));
+      $("modal-badge").className = "badge " + s.status;
+      $("modal-badge").textContent = labelStatus(s.status);
+      $("modal-title").textContent = s.title;
+      $("modal-does").textContent = s.does || "";
+      $("modal-not").textContent = s.not || "";
+      $("modal-not").style.display = s.not ? "block" : "none";
+      $("stage-modal").showModal();
+    }
+
+    $("modal-close").addEventListener("click", () => $("stage-modal").close());
+    $("stage-modal").addEventListener("click", (ev) => {
+      if (ev.target === $("stage-modal")) $("stage-modal").close();
+    });
+
+    async function loadJobs(selectId) {
+      const data = await jobsFetch("/jobs").then(r => r.json());
+      const jobs = data.jobs || [];
+      $("jobs").innerHTML = jobs.map(j => `
+        <tr data-id="${j.id}">
+          <td class="status-${j.status}">${labelStatus(j.status)}</td>
+          <td>${esc(j.title)}</td>
+          <td>${esc(j.client_name || "")}</td>
+          <td>${esc(j.job_type_label || j.job_type || "-")}</td>
+          <td>${(j.created_at || "").slice(0, 19).replace("T", " ")}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="5" class="muted">No jobs yet.</td></tr>`;
+      $("jobs").querySelectorAll("tr[data-id]").forEach(tr => {
+        tr.addEventListener("click", () => openJob(tr.dataset.id));
+      });
+      if (selectId) openJob(selectId);
+    }
+
+    function esc(s) {
+      return String(s ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[c]));
+    }
+
+    function direction(v) {
+      if (v === "debit") return "Out";
+      if (v === "credit") return "In";
+      return v || "";
+    }
+
+    function exceptionCard(jobId, e) {
+      const kind = e.kind || "unknown";
+      const proposed = e.proposed_account
+        ? `${esc(e.proposed_account)} / ${esc(e.proposed_vat || "-")}`
+        : "none yet";
+      const page = e.source_page != null ? ` · statement page ${esc(e.source_page)}` : "";
+      const siblings = e.sibling_count
+        ? `<p class="exc-meta">This answer also codes ${e.sibling_count} other line(s) for the same payee on this job.</p>`
+        : "";
+      let actions = "";
+      if (kind === "duplicate") {
+        actions = `
+          <div class="exc-actions">
+            <button class="btn gold" type="button" data-act="accept">Keep both</button>
+            <button class="btn warn" type="button" data-act="exclude_repeat">This is a repeat</button>
+          </div>`;
+      } else if (kind === "missing_document") {
+        actions = `
+          <div class="exc-actions">
+            <button class="btn gold" type="button" data-act="accept">Carry on without it</button>
+          </div>`;
+      } else {
+        actions = `
+          <div class="exc-actions">
+            <button class="btn gold" type="button" data-act="accept" ${e.proposed_account ? "" : "disabled"}>Accept proposed</button>
+            <input data-account placeholder="Account name" value="${esc(e.proposed_account || "")}" />
+            <select data-vat>
+              ${["SR","ZR","EX","NV","OS"].map(v => `<option value="${v}" ${v === (e.proposed_vat || "NV") ? "selected" : ""}>${v}</option>`).join("")}
+            </select>
+            <button class="btn secondary" type="button" data-act="override">Override</button>
+          </div>`;
+      }
+      return `
+        <div class="exc-card ${kind}" data-eid="${esc(e.id)}" data-job="${esc(jobId)}">
+          <div class="badge ${kind === "duplicate" ? "next" : "blocked"}">${esc(KIND_LABEL[kind] || kind)}</div>
+          <p class="exc-q">${esc(e.question)}</p>
+          <p class="exc-meta">${esc(e.txn_date || "")} · ${esc(direction(e.debit_credit))} · ${esc(e.amount)} · proposed ${proposed}${page} · ${esc(SOURCE_LABEL[e.source] || e.source || "-")}</p>
+          ${siblings}
+          ${actions}
+          <div class="err" data-err></div>
+        </div>`;
+    }
+
+    async function openJob(id) {
+      const j = await jobsFetch("/jobs/" + id).then(r => r.json());
+      const tx = j.transactions || [];
+      const ex = j.exceptions || [];
+      const bank = (j.documents || []).find(d => d.kind === "bank");
+      const rows = tx.slice(0, 80).map(t => {
+        const c = (t.ai_transaction_classifications || [])[0] || {};
+        const cls = c.needs_review ? "exc" : "";
+        return `<tr class="${cls}"><td>${esc(t.txn_date || "")}</td><td>${esc(t.description)}</td><td>${esc(direction(t.debit_credit))}</td><td>${esc(t.amount)}</td><td>${esc(c.account_name || c.account_code || "-")}</td><td>${esc(c.vat_code || "")}</td><td>${esc(SOURCE_LABEL[c.source] || c.source || "")}</td></tr>`;
+      }).join("");
+      const ready = j.status === "ready_for_review" || j.status === "approved";
+      const banner = ready
+        ? `<div class="ready-banner"><strong>Ready for review.</strong> Questions are cleared. Download the Excel. A human accountant still checks it. Nothing is filed.</div>`
+        : (ex.length ? `<p class="muted">Highlighted rows still need an accountant. Accept saves the coding for this client. Do not guess if you are not coding this job.</p>` : "");
+      const cards = ex.length
+        ? ex.map(e => exceptionCard(id, e)).join("")
+        : `<p class="muted">No open questions on this job.</p>`;
+      $("job-panel").innerHTML = `
+        <h2 style="margin-top:16px">${esc(j.title)} · <span class="status-${j.status}">${esc(labelStatus(j.status))}</span></h2>
+        <p class="muted">${esc(j.job_type_label || j.job_type || "Job type not set")} · ${esc(bank ? bank.file_name : "No bank file")} · ${tx.length} lines · ${ex.length} questions for the accountant</p>
+        <p>
+          <a class="btn secondary" href="/jobs/${id}/working-file">Download working Excel</a>
+          <a class="btn secondary" href="/jobs/${id}/summary.pdf">Download PDF summary</a>
+          <button class="btn warn" type="button" id="delete-job" data-id="${esc(id)}">Delete job</button>
+        </p>
+        ${banner}
+        <h2>Questions for the accountant</h2>
+        ${cards}
+        <h2 style="margin-top:20px">Lines</h2>
+        <table>
+          <thead><tr><th>Date</th><th>Detail</th><th>In/Out</th><th>Amount</th><th>Account</th><th>VAT</th><th>How</th></tr></thead>
+          <tbody>${rows || "<tr><td colspan=7 class=muted>Not processed yet. Upload a bank file to start.</td></tr>"}</tbody>
+        </table>
+      `;
+      $("job-panel").querySelectorAll(".exc-card").forEach(card => {
+        card.querySelectorAll("button[data-act]").forEach(btn => {
+          btn.addEventListener("click", () => resolveCard(card, btn.dataset.act));
+        });
+      });
+      const del = $("delete-job");
+      if (del) del.addEventListener("click", () => deleteJob(del.dataset.id));
+    }
+
+    async function deleteJob(id) {
+      if (!id) return;
+      if (!window.confirm("Delete this job and its questions? Saved client mappings stay.")) return;
+      const res = await jobsFetch("/jobs/" + id, { method: "DELETE" });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        $("run-msg").textContent = body.detail || "Could not delete job";
+        return;
+      }
+      $("job-panel").innerHTML = "";
+      $("run-msg").textContent = "Job deleted. Start a new one with Company Accounts selected.";
+      await loadJobs();
+    }
+
+    async function resolveCard(card, action) {
+      const err = card.querySelector("[data-err]");
+      err.textContent = "Saving…";
+      card.querySelectorAll("button").forEach(b => b.disabled = true);
+      const body = { action };
+      if (action === "override") {
+        body.account_name = (card.querySelector("[data-account]") || {}).value || "";
+        body.vat_code = (card.querySelector("[data-vat]") || {}).value || "NV";
+      }
+      try {
+        const res = await jobsFetch(`/jobs/${card.dataset.job}/exceptions/${card.dataset.eid}/resolve`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          const detail = data.detail;
+          throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail || res.statusText));
+        }
+        await loadJobs(data.id);
+      } catch (e) {
+        err.textContent = String(e.message || e);
+        card.querySelectorAll("button").forEach(b => b.disabled = false);
+      }
+    }
+
+    $("run-form").addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      const btn = $("run-btn");
+      btn.disabled = true;
+      $("run-msg").textContent = "Uploading…";
+      try {
+        const fd = new FormData(ev.target);
+        if (!fd.get("job_type")) throw new Error("Choose a job type first.");
+        const created = await jobsFetch("/jobs", { method: "POST", body: fd }).then(r => r.json());
+        if (!created.id) throw new Error(created.detail || "create failed");
+        $("run-msg").textContent = "Processing…";
+        const processed = await jobsFetch("/jobs/" + created.id + "/process", { method: "POST" }).then(async r => {
+          const body = await r.json();
+          if (!r.ok) throw new Error(body.detail || r.statusText);
+          return body;
+        });
+        $("run-msg").textContent = "Done: " + labelStatus(processed.status);
+        await loadJobs(processed.id);
+      } catch (err) {
+        $("run-msg").textContent = String(err.message || err);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    loadHealth();
+    loadPipeline();
+    loadJobs();
+    setInterval(loadHealth, 15000);
+  </script>
+</body>
+</html>

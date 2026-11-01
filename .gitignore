@@ -1,0 +1,38 @@
+# env
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.cer
+*.crt
+bridgit-graph.*
+
+# python
+apps/api/.venv/
+apps/api/__pycache__/
+apps/api/**/__pycache__/
+*.pyc
+.pytest_cache/
+
+# node
+apps/web/node_modules/
+apps/web/.next/
+apps/web/out/
+
+# os / ide
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# client data — never commit real MA files
+data/client/
+*.xlsx
+*.xls
+*.csv
+*.pdf
+!apps/api/tests/fixtures/.gitkeep
+!apps/api/app/static/demo/
+!apps/api/app/static/demo/**
+!apps/api/app/static/MA_logo.jpg

@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bridgit | MA Associates</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    try {
+      if (localStorage.getItem("bridgit_theme") === "light") document.documentElement.dataset.theme = "light";
+    } catch (e) {}
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: "var(--bg)",
+            navy2: "var(--bg-2)",
+            gold: "var(--btn)",
+            paper: "var(--stage)",
+            line: "var(--line)",
+            mist: "var(--ink)",
+            muted: "var(--muted)",
+            panel: "var(--panel)",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    :root {
+      --bg: #07080c;
+      --bg-2: #141820;
+      --ink: #f4f1ea;
+      --muted: #9aa3b2;
+      --stage: #090b10;
+      --line: #262b36;
+      --panel: #12151c;
+      --btn: #f3f1ec;
+      --glow: rgba(186, 204, 255, .14);
+      color-scheme: dark;
+    }
+    html[data-theme="light"] {
+      --bg: #f3f4f6;
+      --bg-2: #e7e9ee;
+      --ink: #16181d;
+      --muted: #5e6572;
+      --stage: #f7f8fa;
+      --line: #e1e4ea;
+      --panel: #ffffff;
+      --btn: #16181d;
+      --glow: rgba(90, 120, 180, .16);
+      color-scheme: light;
+    }
+    body { font-family: "Instrument Sans", system-ui, sans-serif; letter-spacing: -0.011em; }
+    ::selection { background: rgba(243,241,236,.28); }
+    .stage {
+      position: relative;
+      background:
+        radial-gradient(720px 380px at 50% 0%, var(--glow), transparent 62%),
+        var(--stage);
+      overflow: hidden;
+    }
+    .stage::before {
+      content: "";
+      pointer-events: none;
+      position: absolute;
+      width: 520px; height: 520px;
+      left: 18%; top: -180px;
+      background: radial-gradient(circle, var(--glow), transparent 68%);
+      animation: drift 16s ease-in-out infinite;
+    }
+    .stage > * { position: relative; z-index: 1; }
+    .side {
+      background: rgba(12, 14, 18, .92);
+      border-right: 1px solid rgba(255,255,255,.06);
+    }
+    .job-row { border: 1px solid transparent; border-radius: 12px; }
+    .job-row:hover { background: rgba(255,255,255,.04); }
+    .job-row.active { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); }
+    .pill { transition: background 0.15s; }
+    .pill:hover { background: #17304a; color: #fff; }
+    .pill-primary { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.2); color: #f3f1ec; }
+    .view-btn.active { background: #f3f1ec; color: #121418; }
+    .chat-thread { scroll-behavior: smooth; }
+    .dot {
+      width: 6px; height: 6px; border-radius: 999px; background: #f3f1ec;
+      animation: bridgit-bounce 1s infinite ease-in-out;
+    }
+    .dot:nth-child(2) { animation-delay: 0.15s; }
+    .dot:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes bridgit-bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.35; }
+      40% { transform: translateY(-5px); opacity: 1; }
+    }
+    #chat-input { resize: none; color: #e8eef6; }
+    input, select, textarea {
+      background: #11161f;
+      color: #e8eef6;
+      border-color: #243044;
+    }
+    .composer-box {
+      box-shadow: 0 24px 80px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      background: rgba(18, 21, 28, .92);
+      border-radius: 22px;
+      backdrop-filter: blur(12px);
+    }
+    .composer-box.drag { border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.04); }
+    .home-card {
+      background: rgba(18,21,28,.72);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
+      text-align: left;
+      transition: border-color .15s, transform .15s, background .15s;
+    }
+    .home-card:hover { border-color: rgba(255,255,255,.22); transform: translateY(-2px); background: rgba(24,28,36,.9); }
+    .orb {
+      width: 72px; height: 72px; border-radius: 999px; margin: 0 auto 18px;
+      background: radial-gradient(circle at 32% 28%, #fff, #cfd3da 42%, #6d7380 78%);
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+    .fact {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 14px;
+      padding: 10px 12px;
+      min-width: 0;
+    }
+    .fact span { display: block; font-size: 11px; color: #9aa3b2; letter-spacing: .02em; }
+    .fact strong { display: block; margin-top: 2px; font-size: 13px; font-weight: 550; color: #f3f1ec; }
+    .attach-chip {
+      display: inline-flex; align-items: center; gap: 6px; max-width: 220px;
+      background: #0d121a; border: 1px solid #243044; color: #e8eef6;
+      border-radius: 999px; padding: 4px 8px 4px 10px; font-size: 12px;
+    }
+    .attach-chip button { color: #8b96a8; font-size: 14px; line-height: 1; }
+    .attach-chip button:hover { color: #f3f1ec; }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; letter-spacing: .02em;
+      padding: 2px 8px; border-radius: 999px; border: 1px solid #243044;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .job-head-top { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+    .job-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .fact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .fact strong { overflow-wrap: break-word; }
+    .mobile-bar { display: none; }
+    .nav-scrim { display: none; }
+    @media (min-width: 1080px) {
+      .job-head-top { flex-direction: row; align-items: flex-start; justify-content: space-between; }
+      .job-actions { justify-content: flex-end; max-width: 460px; }
+    }
+    @media (max-width: 860px) {
+      .mobile-bar {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.06);
+      }
+      .side {
+        position: fixed; z-index: 40; top: 0; bottom: 0; left: 0;
+        width: min(288px, 88vw);
+        transform: translateX(-105%);
+        transition: transform .22s ease;
+      }
+      .side.open { transform: none; }
+      .nav-scrim.show {
+        display: block; position: fixed; inset: 0; z-index: 30;
+        background: rgba(0,0,0,.5);
+      }
+    }
+    .status-pill.waiting { color: #8b96a8; }
+    .status-pill.processing { color: #d5d8de; border-color: rgba(255,255,255,.16); }
+    .status-pill.input { color: #d5d8de; border-color: rgba(255,255,255,.16); }
+    .status-pill.ready { color: #7dcea0; border-color: rgba(125,206,160,.35); }
+    .status-pill.fail { color: #f0a0a0; border-color: rgba(240,160,160,.35); }
+    .q-card { background: linear-gradient(180deg, #141a24 0%, #11161f 100%); }
+    .send-btn[disabled] { opacity: .45; }
+    .bubble-user { background: #1c2230; color: #f4f1ea; border-radius: 18px 18px 6px 18px; border: 1px solid rgba(255,255,255,.08); }
+    .bubble-ai { background: rgba(20,24,32,.9); color: #f4f1ea; border: 1px solid rgba(255,255,255,.06); border-radius: 18px 18px 18px 6px; }
+    #modal-panel { background: #12151c; color: #f4f1ea; border: 1px solid rgba(255,255,255,.08); border-radius: 22px; }
+    .file-drop {
+      display: block; cursor: pointer;
+      border: 1px dashed #243044; border-radius: 14px; padding: 16px 18px;
+      background: #0d121a; transition: border-color .15s, background .15s;
+    }
+    .file-drop:hover, .file-drop.drag { border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.03); }
+    .file-drop.has-file { border-style: solid; border-color: rgba(255,255,255,.4); }
+    .file-drop input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+    .tip {
+      position: relative; display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; border-radius: 99px; border: 1px solid rgba(255,255,255,.25);
+      color: #c5cbd4; font-size: 10px; font-weight: 700; cursor: help; line-height: 1;
+    }
+    .tip .tip-box {
+      display: none; position: absolute; z-index: 50; left: 50%; bottom: calc(100% + 8px);
+      transform: translateX(-50%); width: 230px; background: #0b0f16; border: 1px solid #243044;
+      color: #e8eef6; font-size: 12px; font-weight: 400; line-height: 1.45; padding: 8px 10px;
+      border-radius: 10px; box-shadow: 0 12px 40px rgba(0,0,0,.5); text-transform: none; letter-spacing: 0;
+      white-space: normal; text-align: left;
+    }
+    .tip:hover .tip-box, .tip:focus .tip-box { display: block; }
+    .q-card { transition: opacity .2s ease, transform .2s ease; }
+    .q-card.leaving { opacity: 0; transform: translateY(-8px); }
+    .orb-wrap { position: relative; width: 96px; height: 96px; margin: 0 auto 18px; }
+    .orb { margin: 16px auto; animation: floaty 5.6s ease-in-out infinite; }
+    .orb-ring {
+      position: absolute; inset: 0; border-radius: 999px;
+      background: conic-gradient(from 90deg, transparent 0 68%, rgba(255,255,255,.75), transparent 86%);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1px));
+      mask: radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1px));
+      animation: spin-slow 12s linear infinite;
+    }
+    .live-dot {
+      display: inline-block; width: 6px; height: 6px; margin-right: 8px; border-radius: 99px;
+      background: #3dbe86; box-shadow: 0 0 0 0 rgba(61,190,134,.45);
+      animation: pingsoft 2.6s ease-out infinite; vertical-align: middle;
+    }
+    .rise { animation: rise .55s ease both; }
+    .composer-box { transition: border-color .2s, box-shadow .25s; }
+    .composer-box:focus-within {
+      border-color: rgba(255,255,255,.28);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.04), 0 24px 80px rgba(0,0,0,.45);
+    }
+    .status-pill.processing { animation: pingsoft 2.2s ease-out infinite; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+    @keyframes spin-slow { to { transform: rotate(360deg); } }
+    @keyframes drift {
+      0%, 100% { transform: translate3d(0,0,0); }
+      50% { transform: translate3d(40px, 18px, 0); }
+    }
+    @keyframes pingsoft {
+      0% { box-shadow: 0 0 0 0 rgba(61,190,134,.4); }
+      100% { box-shadow: 0 0 0 8px rgba(61,190,134,0); }
+    }
+    html[data-theme="light"] .side { background: rgba(255,255,255,.96); border-right-color: rgba(16,18,24,.06); }
+    html[data-theme="light"] .mobile-bar { border-bottom-color: rgba(16,18,24,.08); }
+    html[data-theme="light"] .job-row:hover { background: rgba(16,18,24,.04); }
+    html[data-theme="light"] .job-row.active { background: rgba(16,18,24,.05); border-color: rgba(16,18,24,.1); }
+    html[data-theme="light"] .view-btn.active { background: #16181d; color: #f7f8fa; }
+    html[data-theme="light"] .composer-box {
+      background: rgba(255,255,255,.92);
+      border-color: rgba(16,18,24,.08);
+      box-shadow: 0 18px 50px rgba(16,18,24,.06);
+    }
+    html[data-theme="light"] .composer-box:focus-within {
+      border-color: rgba(16,18,24,.28);
+      box-shadow: 0 0 0 4px rgba(16,18,24,.04), 0 18px 50px rgba(16,18,24,.06);
+    }
+    html[data-theme="light"] .home-card { background: #fff; border-color: rgba(16,18,24,.08); }
+    html[data-theme="light"] .home-card:hover { border-color: rgba(16,18,24,.2); background: #fff; }
+    html[data-theme="light"] .fact { background: #fff; border-color: rgba(16,18,24,.06); }
+    html[data-theme="light"] .fact strong { color: #16181d; }
+    html[data-theme="light"] .bubble-user { background: #16181d; color: #f7f8fa; border-color: transparent; }
+    html[data-theme="light"] .bubble-ai { background: #fff; color: #16181d; border-color: rgba(16,18,24,.08); }
+    html[data-theme="light"] #modal-panel { background: #fff; color: #16181d; border-color: rgba(16,18,24,.08); }
+    html[data-theme="light"] .q-card { background: #fff; border-color: rgba(16,18,24,.08); }
+    html[data-theme="light"] .file-drop { background: #fff; border-color: #d5d8e0; }
+    html[data-theme="light"] .file-drop:hover, html[data-theme="light"] .file-drop.drag { border-color: #16181d; background: #f7f8fa; }
+    html[data-theme="light"] .attach-chip { background: #fff; color: #16181d; border-color: #e1e4ea; }
+    html[data-theme="light"] .status-pill { border-color: #e1e4ea; }
+    html[data-theme="light"] .status-pill.waiting,
+    html[data-theme="light"] .status-pill.processing,
+    html[data-theme="light"] .status-pill.input { color: #3d4450; }
+    html[data-theme="light"] .status-pill.ready { color: #157a45; border-color: rgba(21,122,69,.25); }
+    html[data-theme="light"] .status-pill.fail { color: #a33b3b; border-color: rgba(163,59,59,.25); }
+    html[data-theme="light"] input, html[data-theme="light"] select, html[data-theme="light"] textarea {
+      background: #fff; color: #16181d; border-color: #e1e4ea;
+    }
+    html[data-theme="light"] #chat-input { color: #16181d; }
+    html[data-theme="light"] .tip { border-color: rgba(16,18,24,.2); color: #5e6572; }
+    html[data-theme="light"] .tip .tip-box { background: #fff; color: #16181d; border-color: #e1e4ea; box-shadow: 0 12px 40px rgba(16,18,24,.12); }
+    html[data-theme="light"] .orb-ring {
+      background: conic-gradient(from 90deg, transparent 0 68%, rgba(22,24,29,.55), transparent 86%);
+    }
+    html[data-theme="light"] .text-white { color: #16181d; }
+    html[data-theme="light"] .text-slate-400,
+    html[data-theme="light"] .text-slate-500 { color: #5e6572; }
+    html[data-theme="light"] .border-white\/10,
+    html[data-theme="light"] .border-white\/5,
+    html[data-theme="light"] .border-white\/6 { border-color: rgba(16,18,24,.08); }
+    html[data-theme="light"] .bg-white\/10 { background: rgba(16,18,24,.05); }
+    html[data-theme="light"] .hover\:bg-white\/5:hover { background: rgba(16,18,24,.04); }
+    @media (prefers-reduced-motion: reduce) {
+      .stage::before, .orb, .orb-ring, .live-dot, .rise, .status-pill.processing { animation: none; }
+    }
+  </style>
+</head>
+<body class="bg-navy text-mist min-h-screen">
+  <div id="root"></div>
+
+  <script>
+    const THEME_KEY = "bridgit_theme";
+    function themeIsLight() {
+      return document.documentElement.dataset.theme === "light";
+    }
+    function paintThemeButton(btn) {
+      if (!btn) return;
+      const light = themeIsLight();
+      btn.textContent = light ? "Dark" : "Light";
+      btn.setAttribute("aria-pressed", light ? "true" : "false");
+    }
+    function setTheme(light) {
+      if (light) document.documentElement.dataset.theme = "light";
+      else delete document.documentElement.dataset.theme;
+      try { localStorage.setItem(THEME_KEY, light ? "light" : "dark"); } catch (e) {}
+      paintThemeButton(document.getElementById("theme-toggle"));
+    }
+    function bindTheme(id) {
+      const btn = document.getElementById(id);
+      paintThemeButton(btn);
+      if (btn) btn.onclick = () => setTheme(!themeIsLight());
+    }
+    const AUTH_KEY = "bridgit_authed";
+    const VIEW_KEY = "bridgit_view";
+    const Q_KEY = "bridgit_show_questions";
+    const VAT_CODES = ["SR", "ZR", "EX", "NV", "OS"];
+    const STATUS_LABEL = {
+      queued: "Waiting",
+      processing: "Processing",
+      needs_input: "Needs your input",
+      ready_for_review: "Ready for review",
+      approved: "Approved",
+    };
+
+    function jobLastError(j) {
+      return ((j && j.engine) || {}).last_error || "";
+    }
+
+    function statusLabel(j) {
+      const status = (j && j.status) || "";
+      if (jobLastError(j) && (status === "queued" || status === "processing")) return "Didn't finish";
+      return STATUS_LABEL[status] || status;
+    }
+    function statusPillClass(j) {
+      const label = statusLabel(j);
+      if (label === "Didn't finish") return "fail";
+      if (j.status === "processing") return "processing";
+      if (j.status === "needs_input") return "input";
+      if (j.status === "ready_for_review" || j.status === "approved") return "ready";
+      return "waiting";
+    }
+    function statusPill(j) {
+      return `<span class="status-pill ${statusPillClass(j)}">${esc(statusLabel(j))}</span>`;
+    }
+    const KIND_LABEL = {
+      duplicate: "Possible duplicate",
+      mapping_review: "Needs confirmation",
+      llm: "AI suggestion",
+      unknown: "Needs a decision",
+      missing_document: "Missing document",
+    };
+
+    let jobsCache = [];
+    let clientsCache = [];
+    let selectedJobId = null;
+    let suggestedAccounts = [];
+    let lastJob = null;
+    let showDemo = false;
+    let pollTimer = null;
+    let pollTicks = 0;
+    let pendingChatFiles = [];
+
+    function getView() {
+      return localStorage.getItem(VIEW_KEY) === "chat" ? "chat" : "cards";
+    }
+    function setView(v) {
+      localStorage.setItem(VIEW_KEY, v === "chat" ? "chat" : "cards");
+    }
+    function questionsOpen() {
+      return localStorage.getItem(Q_KEY) !== "0";
+    }
+    function setQuestionsOpen(v) {
+      localStorage.setItem(Q_KEY, v ? "1" : "0");
+    }
+
+    function bubble(role, text) {
+      const mine = role === "user";
+      return `<div class="flex ${mine ? "justify-end" : "justify-start"} mb-4">
+        ${mine ? "" : `<img src="/static/MA_logo.jpg" alt="" class="h-7 w-7 rounded-full object-cover mr-2 mt-1 shrink-0" />`}
+        <div class="max-w-[78%] px-4 py-2.5 text-[15px] leading-relaxed whitespace-pre-wrap ${mine ? "bubble-user" : "bubble-ai"}">${esc(text)}</div>
+      </div>`;
+    }
+
+    function thinkingHtml() {
+      return `<div id="thinking" class="flex justify-start mb-4">
+        <img src="/static/MA_logo.jpg" alt="" class="h-7 w-7 rounded-full object-cover mr-2 mt-1 shrink-0" />
+        <div class="bubble-ai px-4 py-3 flex items-center gap-2">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="text-xs text-slate-500 ml-1">Bridgit is working</span>
+        </div>
+      </div>`;
+    }
+
+    function esc(s) {
+      return String(s ?? "")
+        .replace(/[\u2014\u2013]/g, "-")
+        .replace(/[&<>"']/g, c => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+        }[c]));
+    }
+
+    const VAT_LABEL = {
+      SR: "SR · 20% standard",
+      ZR: "ZR · zero rated",
+      EX: "EX · exempt",
+      NV: "NV · no VAT",
+      OS: "OS · outside scope",
+    };
+
+    function tip(text) {
+      return `<button type="button" class="tip ml-1" aria-label="Help"><span>i</span><span class="tip-box">${esc(text)}</span></button>`;
+    }
+    function formatGBP(n) {
+      const x = Number(n);
+      if (!Number.isFinite(x)) return "";
+      return "£" + Math.abs(x).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function plainJobKind(j) {
+      const s = ((j.job_type || "") + " " + (j.job_type_label || "")).toLowerCase();
+      if (s.includes("vat")) return "VAT return";
+      if (s.includes("year") || s.includes("statutory") || s.includes("company")) return "Year-end accounts";
+      return j.job_type_label || "Bookkeeping";
+    }
+    function periodLabel(j) {
+      const a = formatDay(j.period_start);
+      const b = formatDay(j.period_end);
+      if (a && b) return a + " – " + b;
+      return a || b || j.period || "Not set";
+    }
+    function formatDay(d) {
+      if (!d) return "";
+      const dt = new Date(String(d).slice(0, 10) + "T12:00:00");
+      if (Number.isNaN(dt.getTime())) return String(d).slice(0, 10);
+      return dt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    }
+    function flowBits(e) {
+      const dc = (e.debit_credit || "").toLowerCase();
+      const gbp = formatGBP(e.amount);
+      if (dc === "credit") return {
+        chip: `Money in ${gbp}`,
+        line: `This landed in the bank (a deposit / receipt)${formatDay(e.txn_date) ? " on " + formatDay(e.txn_date) : ""}.`,
+        cls: "bg-emerald-950/50 text-emerald-300 border-emerald-800",
+      };
+      if (dc === "debit") return {
+        chip: `Money out ${gbp}`,
+        line: `This left the bank (a payment)${formatDay(e.txn_date) ? " on " + formatDay(e.txn_date) : ""}.`,
+        cls: "bg-rose-950/40 text-rose-300 border-rose-900",
+      };
+      return { chip: gbp || "Amount unknown", line: "", cls: "bg-navy2 text-mist border-line" };
+    }
+    function questionFacts(e) {
+      const flow = flowBits(e);
+      const payee = ((e.description || "").split(";")[0] || "").trim();
+      const date = formatDay(e.txn_date);
+      return `
+        <div class="flex flex-wrap items-center gap-2 mt-3">
+          <span class="text-xs font-semibold px-2 py-0.5 rounded border ${flow.cls}">${esc(flow.chip)}</span>
+          ${date ? `<span class="text-xs text-muted">${esc(date)}</span>` : ""}
+          ${e.sibling_count ? `<span class="text-xs text-muted">+ ${e.sibling_count} more line(s) same payee</span>` : ""}
+        </div>
+        ${payee ? `<p class="mt-3 text-lg font-semibold text-mist">${esc(payee)}</p>` : ""}
+        ${flow.line ? `<p class="text-sm text-muted mt-1">${esc(flow.line)}</p>` : ""}`;
+    }
+
+    function isAuthed() {
+      return localStorage.getItem(AUTH_KEY) === "1";
+    }
+
+    function setAuthed(v) {
+      if (v) localStorage.setItem(AUTH_KEY, "1");
+      else localStorage.removeItem(AUTH_KEY);
+    }
+
+    function route() {
+      const hash = (location.hash || "#/login").replace(/^#/, "");
+      const parts = hash.split("/").filter(Boolean);
+      if (!isAuthed()) {
+        renderLogin();
+        return;
+      }
+      if (parts[0] === "job" && parts[1]) {
+        selectedJobId = parts[1];
+        renderShell();
+        loadJobDetail(parts[1]);
+        return;
+      }
+      selectedJobId = null;
+      renderShell();
+      renderEmptyMain();
+    }
+
+    async function api(path, opts = {}) {
+      const res = await fetch(path, { credentials: "same-origin", ...opts });
+      if (res.status === 401) {
+        setAuthed(false);
+        location.hash = "#/login";
+        throw new Error("Session expired. Sign in again.");
+      }
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const d = body.detail;
+        throw new Error(typeof d === "string" ? d : JSON.stringify(d || res.statusText));
+      }
+      return body;
+    }
+
+    function renderLogin() {
+      document.getElementById("root").innerHTML = `
+        <div class="stage min-h-screen flex items-center justify-center p-6">
+          <div class="rise w-full max-w-md bg-panel/90 rounded-3xl shadow-2xl p-8 border border-white/10">
+            <div class="flex items-center justify-between mb-4">
+              <img src="/static/MA_logo.jpg" alt="MA Associates" class="h-12 w-12 rounded-full object-cover" />
+              <button type="button" id="theme-toggle" class="text-xs border border-white/10 rounded-full px-3 py-1 text-muted"></button>
+            </div>
+            <p class="text-[11px] font-semibold tracking-[0.18em] text-muted">MA ASSOCIATES</p>
+            <h1 class="text-3xl font-semibold text-mist mt-2 tracking-tight">Sign in to Bridgit</h1>
+            <p class="text-sm text-muted mt-2 leading-relaxed">The bookkeeping agent. It codes known payees, asks the rest, and writes the bank working file.</p>
+            <label class="block text-xs font-semibold text-slate-500 uppercase mt-6 mb-1">Password</label>
+            <input id="pw" type="password" class="w-full border border-line rounded-lg px-3 py-2.5 mt-0.5" placeholder="Team password" />
+            <p id="login-err" class="text-amber-400 text-sm mt-2 min-h-[20px]"></p>
+            <button id="login-btn" type="button" class="mt-4 w-full bg-gold text-navy rounded-lg py-3 font-semibold hover:opacity-90">
+              Continue
+            </button>
+            <p class="text-xs text-slate-400 mt-6">Developers: internal board at <a href="/board" class="underline">/board</a></p>
+          </div>
+        </div>`;
+      bindTheme("theme-toggle");
+      document.getElementById("login-btn").onclick = tryLogin;
+      document.getElementById("pw").onkeydown = (e) => { if (e.key === "Enter") tryLogin(); };
+    }
+
+    async function tryLogin() {
+      const pw = document.getElementById("pw").value;
+      const err = document.getElementById("login-err");
+      err.textContent = "Checking…";
+      try {
+        const data = await fetch("/meta/password-check", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pw }),
+        }).then(r => r.json());
+        if (data.warning === "no_password_configured") {
+          err.textContent = "No password set on server. Set BRIDGIT_PASSWORD in .env or Railway.";
+          return;
+        }
+        if (!data.ok) {
+          err.textContent = "Wrong password.";
+          return;
+        }
+        setAuthed(true);
+        location.hash = "#/jobs";
+        route();
+      } catch (e) {
+        err.textContent = String(e.message || e);
+      }
+    }
+
+    function renderShell() {
+      document.getElementById("root").innerHTML = `
+        <div class="flex h-screen overflow-hidden">
+          <div id="nav-scrim" class="nav-scrim"></div>
+          <aside id="side" class="side w-[268px] text-mist flex flex-col shrink-0">
+            <div class="px-4 pt-5 pb-3 flex items-center gap-3">
+              <img src="/static/MA_logo.jpg" alt="MA Associates" class="h-9 w-9 rounded-full object-cover bg-white" />
+              <div>
+                <p class="text-sm font-semibold tracking-tight">Bridgit</p>
+                <p class="text-[11px] text-muted">MA Associates</p>
+              </div>
+            </div>
+            <button id="new-job-btn" type="button" class="mx-3 mb-2 py-2.5 px-3 rounded-full bg-mist text-navy font-semibold text-sm hover:opacity-90">
+              + New job
+            </button>
+            <p class="px-5 pt-3 pb-1 text-[11px] uppercase tracking-[0.14em] text-muted">Jobs</p>
+            <div id="sidebar-jobs" class="flex-1 overflow-y-auto px-2 pb-4 text-sm"></div>
+            <div class="p-3 border-t border-white/5 space-y-2">
+              <button type="button" id="theme-toggle" class="w-full py-2 px-3 rounded-lg border border-white/10 text-muted text-sm hover:bg-white/5"></button>
+              <button id="sign-out" type="button" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg border border-white/10 text-mist text-sm font-medium hover:bg-white/5 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd" d="M6 10a.75.75 0 0 1 .75-.75h9.546l-1.048-.943a.75.75 0 1 1 1.004-1.114l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H6.75A.75.75 0 0 1 6 10Z" clip-rule="evenodd" />
+                </svg>
+                Sign out
+              </button>
+            </div>
+          </aside>
+          <div class="flex-1 min-w-0 min-h-0 flex flex-col">
+            <div class="mobile-bar shrink-0">
+              <button type="button" id="nav-toggle" class="text-sm border border-white/10 rounded-full px-3 py-1 text-mist">Jobs</button>
+              <span class="text-sm font-medium text-mist">Bridgit</span>
+            </div>
+            <main id="main" class="stage flex-1 min-h-0 flex flex-col overflow-hidden"></main>
+          </div>
+        </div>
+        <div id="modal-root" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div class="rounded-xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6" id="modal-panel"></div>
+        </div>`;
+      document.getElementById("sign-out").onclick = async () => {
+        try {
+          await fetch("/meta/logout", { method: "POST", credentials: "same-origin" });
+        } catch (_) {}
+        setAuthed(false);
+        location.hash = "#/login";
+        route();
+      };
+      bindTheme("theme-toggle");
+      const setNav = (open) => {
+        document.getElementById("side").classList.toggle("open", open);
+        document.getElementById("nav-scrim").classList.toggle("show", open);
+      };
+      document.getElementById("nav-toggle").onclick = () => setNav(true);
+      document.getElementById("nav-scrim").onclick = () => setNav(false);
+      document.getElementById("new-job-btn").onclick = () => { setNav(false); openNewJobModal(); };
+      refreshSidebar();
+    }
+
+    function renderEmptyMain() {
+      const waiting = jobsCache.filter(j => j.status === "needs_input").length;
+      const ready = jobsCache.filter(j => j.status === "ready_for_review" || j.status === "approved").length;
+      document.getElementById("main").innerHTML = `
+        <div class="flex-1 overflow-y-auto px-6 py-10">
+          <div class="rise max-w-3xl mx-auto text-center pt-6">
+            <div class="orb-wrap" aria-hidden="true"><div class="orb-ring"></div><div class="orb"></div></div>
+            <p class="text-[11px] tracking-[0.2em] text-muted font-semibold"><span class="live-dot"></span>YOUR BOOKKEEPING AGENT</p>
+            <h2 class="text-4xl md:text-5xl font-semibold text-mist mt-3 tracking-tight">Hello. What should we code?</h2>
+            <p class="text-muted mt-3 max-w-lg mx-auto leading-relaxed">Drop a bank file and last year's Excel. Bridgit codes payees it already knows, asks only the rest, and writes the bank working file.</p>
+            <div class="mt-8 text-left">
+              <button type="button" id="home-composer" class="composer-box w-full p-4 flex items-center justify-between gap-3">
+                <span class="text-muted text-sm">Start a job — bank CSV, last year, or both</span>
+                <span class="h-10 w-10 rounded-full bg-gold text-navy font-semibold flex items-center justify-center shrink-0">+</span>
+              </button>
+              <p class="text-[11px] text-slate-500 mt-2 px-2">You can also attach more files later in Chat, with a message in the same send.</p>
+            </div>
+            <div class="grid sm:grid-cols-3 gap-3 mt-8 text-left">
+              <button type="button" id="home-new" class="home-card p-4">
+                <p class="text-sm font-semibold text-mist">New year-end or VAT job</p>
+                <p class="text-xs text-muted mt-1 leading-relaxed">Client, period, bank file, last year's workbook.</p>
+              </button>
+              <button type="button" id="home-open" class="home-card p-4">
+                <p class="text-sm font-semibold text-mist">Open questions</p>
+                <p class="text-xs text-muted mt-1 leading-relaxed">${waiting ? waiting + " job" + (waiting === 1 ? "" : "s") + " still need an answer." : "Nothing waiting. Start a job first."}</p>
+              </button>
+              <button type="button" id="home-ready" class="home-card p-4">
+                <p class="text-sm font-semibold text-mist">Working Excel</p>
+                <p class="text-xs text-muted mt-1 leading-relaxed">${ready ? ready + " file" + (ready === 1 ? "" : "s") + " ready to download. Not the statutory pack." : "Excel appears after the bank lines are coded."}</p>
+              </button>
+            </div>
+          </div>
+        </div>`;
+      const goNew = () => openNewJobModal();
+      document.getElementById("home-composer").onclick = goNew;
+      document.getElementById("home-new").onclick = goNew;
+      document.getElementById("home-open").onclick = () => {
+        const j = jobsCache.find(x => x.status === "needs_input");
+        if (!j) return goNew();
+        location.hash = "#/job/" + j.id;
+        route();
+      };
+      document.getElementById("home-ready").onclick = () => {
+        const j = jobsCache.find(x => x.status === "ready_for_review" || x.status === "approved");
+        if (!j) return;
+        location.hash = "#/job/" + j.id;
+        route();
+      };
+    }
+
+    async function refreshSidebar() {
+      const data = await api("/jobs");
+      jobsCache = data.jobs || [];
+      const byClient = {};
+      for (const j of jobsCache) {
+        const c = j.client_name || "Unknown client";
+        (byClient[c] ||= []).push(j);
+      }
+      const clients = Object.keys(byClient).sort();
+      let html = "";
+      for (const c of clients) {
+        html += `<p class="px-3 pt-4 pb-1 text-slate-400 text-xs uppercase tracking-wide">${esc(c)}</p>`;
+        for (const j of byClient[c]) {
+          const active = j.id === selectedJobId ? "active" : "";
+          html += `
+            <button type="button" data-id="${esc(j.id)}" class="job-row w-full text-left px-3 py-2 rounded-lg hover:bg-navy2 ${active}">
+              <span class="block font-medium truncate">${esc(j.title)}</span>
+              <span class="text-xs text-slate-400">${esc(j.job_type_label || j.job_type || "-")}</span>
+              <span class="block mt-1">${statusPill(j)}</span>
+            </button>`;
+        }
+      }
+      if (!html) html = `<p class="px-3 text-slate-400 text-sm">No jobs yet.</p>`;
+      const el = document.getElementById("sidebar-jobs");
+      el.innerHTML = html;
+      el.querySelectorAll(".job-row").forEach(btn => {
+        btn.onclick = () => {
+          const side = document.getElementById("side");
+          const scrim = document.getElementById("nav-scrim");
+          if (side) side.classList.remove("open");
+          if (scrim) scrim.classList.remove("show");
+          location.hash = "#/job/" + btn.dataset.id;
+          route();
+        };
+      });
+      if (!selectedJobId && document.getElementById("main") && !document.getElementById("chat-form")) {
+        renderEmptyMain();
+      }
+    }
+
+    function countCoded(txns) {
+      return (txns || []).filter(t => {
+        const c = (t.ai_transaction_classifications || [])[0] || {};
+        return !c.needs_review && (c.account_name || c.account_code);
+      }).length;
+    }
+
+    function clearPoll() {
+      if (pollTimer) {
+        clearTimeout(pollTimer);
+        pollTimer = null;
+      }
+    }
+    function schedulePoll(id) {
+      clearPoll();
+      pollTicks += 1;
+      if (pollTicks > 90) return;
+      pollTimer = setTimeout(() => loadJobDetail(id, true), 2000);
+    }
+    async function loadAppMeta() {
+      try {
+        const m = await fetch("/meta/app").then(r => r.json());
+        showDemo = !!m.show_demo;
+      } catch {
+        showDemo = true;
+      }
+    }
+
+    async function loadJobDetail(id, silent) {
+      const main = document.getElementById("main");
+      if (!silent) main.innerHTML = `<p class="text-muted p-8">Loading job…</p>`;
+      try {
+        const j = await api("/jobs/" + id);
+        const acc = await api("/jobs/" + id + "/suggested-accounts");
+        suggestedAccounts = acc.accounts || [];
+        renderJobDetail(j, { keepScroll: !!silent });
+        await refreshSidebar();
+      } catch (e) {
+        if (!silent) main.innerHTML = `<p class="text-amber-400 p-8">${esc(e.message)}</p>`;
+        else {
+          const err = document.getElementById("chat-err");
+          if (err) err.textContent = String(e.message || e);
+        }
+      }
+    }
+
+    function renderJobDetail(j, opts) {
+      opts = opts || {};
+      const mainEl = document.getElementById("main");
+      const prevScroll = opts.keepScroll && mainEl ? mainEl.scrollTop : 0;
+      const prevChat = opts.keepScroll ? (document.getElementById("chat-thread") || {}).scrollTop : 0;
+      const tx = j.transactions || [];
+      const ex = j.exceptions || [];
+      const coded = countCoded(tx);
+      const n = tx.length;
+      const open = ex.length;
+      const ready = j.status === "ready_for_review" || j.status === "approved";
+      lastJob = j;
+      const eng = j.engine || {};
+      const rec = eng.bank_rec || {};
+      const codedShown = eng.coded != null ? eng.coded : coded;
+      const recOk = rec.ok === true;
+      const recDiff = rec.difference != null ? Number(rec.difference).toFixed(2) : null;
+      const recLine = recDiff == null
+        ? ""
+        : recOk
+          ? `Bank rec: £0.00 difference, tied.`
+          : `Bank rec does not tie (difference £${esc(recDiff)}).`;
+      const lastErr = jobLastError(j);
+      const hasBank = (j.documents || []).some(d => d.kind === "bank");
+      const canRetry = hasBank && (j.status === "queued" || lastErr);
+      const knownN = Number(j.mapping_count || 0);
+      const knownLine = knownN
+        ? `I already know <strong>${knownN}</strong> payee coding${knownN === 1 ? "" : "s"} for this client. Answers you give here are saved and reused next time.`
+        : `Answers you give here are saved for this client, so the next job asks less.`;
+      const papers = (j.documents || []).filter(d => d.kind && d.kind !== "working_file" && d.kind !== "summary_pdf");
+      const papersLine = papers.length
+        ? papers.map(d => esc(d.file_name || d.kind)).join(" · ")
+        : "";
+      const waitBanner = lastErr
+        ? `
+          <div class="bg-panel border border-white/10 rounded-xl p-5 mb-6">
+            <p class="font-semibold text-mist">Processing did not finish.</p>
+            <p class="text-sm text-muted mt-1">The bank file is uploaded, but Bridgit hit an error before coding the lines. Waiting just means it bounced back to the start. Click retry.</p>
+            ${canRetry ? `<button type="button" id="retry-process" class="mt-3 px-4 py-2 rounded-lg bg-gold text-navy text-sm font-medium">Retry process</button>` : ""}
+          </div>`
+        : (j.status === "queued" && hasBank
+          ? `
+          <div class="bg-panel border border-line rounded-xl p-5 mb-6">
+            <p class="text-mist">Waiting to process. Files are in; the bank lines have not been coded yet.</p>
+            <button type="button" id="retry-process" class="mt-3 px-4 py-2 rounded-lg bg-gold text-navy text-sm font-medium">Process now</button>
+          </div>`
+          : "");
+      const doneBit = open
+        ? `<strong>${open}</strong> question${open === 1 ? "" : "s"} still need your answer before the working file is final.`
+        : (n ? "All questions are answered." : (lastErr ? "Nothing coded yet — process did not finish." : "Not processed yet."));
+
+      if (j.status === "processing") schedulePoll(j.id);
+      else { pollTicks = 0; clearPoll(); }
+
+      let intro = `
+        <div class="bg-panel border border-line rounded-xl p-5 mb-6">
+          <p class="text-xs font-medium text-muted mb-2">Bridgit</p>
+          <p class="text-mist/90 leading-relaxed">
+            I've analysed <strong>${n}</strong> bank line${n === 1 ? "" : "s"} for <strong>${esc(j.client_name)}</strong>.
+            <strong>${codedShown}</strong> line${codedShown === 1 ? "" : "s"} matched prior coding and were applied automatically.
+            ${doneBit}
+          </p>
+          <p class="text-sm text-muted mt-2">${knownLine}</p>
+          ${recLine ? `<p class="text-sm text-muted mt-2">${recLine}</p>` : ""}
+          ${papersLine ? `<p class="text-xs text-slate-400 mt-2">Uploaded: ${papersLine}</p>` : ""}
+        </div>`;
+
+      if (j.status === "processing") {
+        intro += `
+          <div class="bg-panel border border-white/10 rounded-xl p-5 mb-6 flex items-center gap-3">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <p class="text-sm text-mist">Working through the bank file. This can take a minute.</p>
+          </div>`;
+      }
+
+      intro += waitBanner;
+
+      if (ready && !open) {
+        intro += `
+          <div class="bg-panel border border-white/10 rounded-xl p-5 mb-6">
+            <p class="font-semibold text-mist">${j.status === "approved" ? "Approved." : "All done."}</p>
+            <p class="text-sm text-muted mt-1">${n} lines on this job. Download the Excel and PDF for human review. Nothing is filed.</p>
+            <div class="flex gap-3 mt-4 flex-wrap">
+              <a class="inline-block bg-gold text-navy px-4 py-2 rounded-lg text-sm font-medium" href="/jobs/${esc(j.id)}/working-file">Download Excel</a>
+              <a class="inline-block border border-line text-mist px-4 py-2 rounded-lg text-sm" href="/jobs/${esc(j.id)}/summary.pdf">Download PDF</a>
+              ${j.status === "ready_for_review" ? `<button type="button" id="approve-job" class="inline-block border border-white/15 text-mist px-4 py-2 rounded-lg text-sm">Approve</button>` : ""}
+            </div>
+          </div>`;
+      }
+
+      const cards = ex.length
+        ? ex.map((e, i) => questionCard(j.id, e, i + 1, ex.length)).join("")
+        : `<p class="text-slate-500">No open questions.</p>`;
+      const view = getView();
+      const showQ = questionsOpen();
+      const modeToggle = `
+        <div class="inline-flex rounded-full border border-white/10 p-0.5 text-sm">
+          <button type="button" id="view-cards" class="view-btn px-3 py-1 rounded-full ${view === "cards" ? "active" : "text-muted"}">Questions</button>
+          <button type="button" id="view-chat" class="view-btn px-3 py-1 rounded-full ${view === "chat" ? "active" : "text-muted"}">Chat</button>
+        </div>`;
+      const dl = `
+        <a class="text-sm border border-white/10 px-3 py-1.5 rounded-full text-mist hover:bg-white/5" href="/jobs/${esc(j.id)}/working-file">Working Excel</a>
+        <a class="text-sm border border-white/10 px-3 py-1.5 rounded-full text-mist hover:bg-white/5" href="/jobs/${esc(j.id)}/summary.pdf">Summary</a>`;
+      const codedFact = n ? codedShown + " of " + n : "Not coded yet";
+      const recFact = recDiff == null ? "Not checked" : (recOk ? "Ties · £0.00" : "Off by £" + recDiff);
+      const factGrid = `
+          <div class="fact-grid">
+            <div class="fact"><span>Period</span><strong>${esc(periodLabel(j))}</strong></div>
+            <div class="fact"><span>What this is</span><strong>${esc(plainJobKind(j))}</strong></div>
+            <div class="fact"><span>Lines coded</span><strong>${esc(String(codedFact))}</strong></div>
+            <div class="fact"><span>Bank check</span><strong>${esc(recFact)}</strong></div>
+          </div>
+          ${knownN ? `<p class="text-xs text-muted mt-2">${knownN} payee${knownN === 1 ? "" : "s"} already remembered for this client.</p>` : ""}`;
+      const titleBlock = `
+            <div class="min-w-0">
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <h1 class="text-lg font-semibold tracking-tight text-mist">${esc(j.title)}</h1>
+                ${statusPill(j)}
+              </div>
+              <p class="text-sm text-muted mt-1">${esc(j.client_name || "")}</p>
+            </div>`;
+
+      const main = document.getElementById("main");
+      if (view === "chat") {
+        main.className = "stage flex-1 min-h-0 flex flex-col overflow-hidden";
+        const chatMsgs = (j.chat || []).map(m => bubble(m.role, m.text)).join("");
+        main.innerHTML = `
+          <header class="shrink-0 px-4 sm:px-6 pt-4 pb-4 border-b border-white/6">
+            <div class="job-head-top">
+              ${titleBlock}
+              <div class="job-actions">
+                ${modeToggle}
+                ${open ? `<button type="button" id="toggle-questions" class="text-sm border border-white/10 px-3 py-1.5 rounded-full">${showQ ? "Hide questions" : "Show questions (" + open + ")"}</button>` : ""}
+                ${dl}
+              </div>
+            </div>
+            ${factGrid}
+          </header>
+          ${j.status === "processing" ? `<div class="shrink-0 px-6 py-2 text-sm text-mist flex items-center gap-2 border-b border-white/6"><span class="dot"></span><span>Working through the bank file…</span></div>` : ""}
+          ${lastErr ? `<div class="shrink-0 px-6 py-3 border-b border-white/10"><p class="text-sm text-mist font-medium">Processing did not finish.</p><p class="text-xs text-muted mt-1">Files are uploaded. Bridgit hit an error before coding the lines, so it bounced back to Waiting. Click retry.</p>${canRetry ? `<button type="button" id="retry-process" class="mt-2 px-3 py-1.5 rounded-full bg-gold text-navy text-sm font-medium">Retry process</button>` : ""}</div>` : (j.status === "queued" && hasBank ? `<div class="shrink-0 px-6 py-3 border-b border-white/10"><p class="text-sm text-mist">Waiting to process. Files are in; lines are not coded yet.</p><button type="button" id="retry-process" class="mt-2 px-3 py-1.5 rounded-full bg-gold text-navy text-sm font-medium">Process now</button></div>` : "")}
+          <div id="chat-thread" class="chat-thread flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-5">
+            <div class="max-w-3xl mx-auto">
+              <div class="flex justify-start mb-4">
+                <img src="/static/MA_logo.jpg" alt="" class="h-7 w-7 rounded-full object-cover mr-2 mt-1 shrink-0" />
+                <div class="bubble-ai max-w-[78%] px-4 py-2.5 text-[15px] leading-relaxed">
+                  ${n
+                    ? `I've analysed ${n} bank lines for ${esc(j.client_name)}. ${codedShown} matched last year.${knownN ? " I already know " + knownN + " payee coding" + (knownN === 1 ? "" : "s") + " for this client." : ""} ${open ? open + " still need you." : " All questions are answered."}${recLine ? " " + recLine : ""} Answers you type here are saved and reused on the next job.`
+                    : (lastErr
+                      ? `I have the files for ${esc(j.client_name)} but processing did not finish, so there are 0 coded lines. Use Retry process above.`
+                      : `Files for ${esc(j.client_name)} are uploaded. I have not coded the bank lines yet.${knownN ? " I already know " + knownN + " payee coding" + (knownN === 1 ? "" : "s") + " for this client." : ""}`)}
+                </div>
+              </div>
+              ${chatMsgs}
+              ${open && showQ ? `<div id="questions" class="mt-2">${cards}</div>` : `<div id="questions" class="hidden"></div>`}
+            </div>
+          </div>
+          <div class="shrink-0 px-4 sm:px-6 pb-4 pt-2 bg-gradient-to-t from-paper via-paper to-transparent">
+            <form id="chat-form" class="max-w-3xl mx-auto composer-box p-3">
+              <div id="chat-attach-chips" class="flex flex-wrap gap-2 px-1 empty:hidden mb-1"></div>
+              <textarea id="chat-input" rows="1" class="w-full px-2 py-2 text-[15px] outline-none bg-transparent text-mist" placeholder="Message Bridgit… you can attach a file in the same send"></textarea>
+              <div class="flex items-center justify-between mt-1 px-1 gap-2">
+                <div class="flex items-center gap-2 min-w-0">
+                  <button type="button" id="chat-attach" class="shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-full border border-white/10 text-mist text-xs hover:bg-white/5" title="Attach files" aria-label="Add files">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+                    Add files
+                  </button>
+                  <input type="file" id="chat-files" class="hidden" multiple accept=".pdf,.csv,.xlsx,.xlsm,.jpg,.jpeg,.png,.webp,.txt" />
+                  <p class="hidden sm:block text-[11px] text-slate-500 truncate">Message and files in one send · Shift+Enter for a new line</p>
+                </div>
+                <button type="submit" id="chat-send" class="send-btn h-9 w-9 rounded-full bg-gold text-navy text-lg leading-none hover:opacity-90" aria-label="Send">↑</button>
+              </div>
+              <p id="chat-err" class="text-amber-400 text-xs px-2 min-h-[14px]"></p>
+            </form>
+          </div>`;
+      } else {
+        main.className = "stage flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 md:p-8";
+        main.innerHTML = `
+          <header class="mb-6">
+            <div class="job-head-top">
+              ${titleBlock}
+              <div class="job-actions">
+                ${modeToggle}${dl}
+                <button type="button" id="cards-attach" class="text-sm border border-white/10 px-3 py-1.5 rounded-full hover:bg-white/5">Add files</button>
+                <input type="file" id="cards-files" class="hidden" multiple accept=".pdf,.csv,.xlsx,.xlsm,.jpg,.jpeg,.png,.webp,.txt" />
+              </div>
+            </div>
+            ${factGrid}
+          </header>
+          ${intro}
+          <h2 class="text-sm font-bold uppercase tracking-wide text-slate-500 mb-3">Questions</h2>
+          <div id="questions">${cards}</div>`;
+      }
+
+      bindJobActions(j);
+      if (opts.keepScroll && mainEl) {
+        mainEl.scrollTop = prevScroll;
+        const thread = document.getElementById("chat-thread");
+        if (thread && prevChat) thread.scrollTop = prevChat;
+      }
+    }
+
+    function bindQuestionButtons(j) {
+      const qroot = document.getElementById("questions");
+      if (!qroot) return;
+      qroot.querySelectorAll("[data-resolve]").forEach(btn => {
+        btn.onclick = () => resolveQuestion(btn);
+      });
+      qroot.querySelectorAll("[data-toggle-other]").forEach(btn => {
+        btn.onclick = () => {
+          const panel = btn.closest(".q-card").querySelector(".other-panel");
+          panel.classList.toggle("hidden");
+        };
+      });
+    }
+
+    function paintQuestionList(j) {
+      const root = document.getElementById("questions");
+      if (!root) return false;
+      const ex = j.exceptions || [];
+      root.innerHTML = ex.length
+        ? ex.map((e, i) => questionCard(j.id, e, i + 1, ex.length)).join("")
+        : `<p class="text-muted">No open questions.</p>`;
+      bindQuestionButtons(j);
+      document.querySelectorAll("[data-open-count]").forEach(el => {
+        el.textContent = ex.length ? (ex.length + " open") : "All answered";
+      });
+      return true;
+    }
+
+    function bindJobActions(j) {
+      bindQuestionButtons(j);
+      const retry = document.getElementById("retry-process");
+      if (retry) retry.onclick = () => retryProcess(j.id);
+      const approve = document.getElementById("approve-job");
+      if (approve) approve.onclick = () => approveJob(j.id);
+      const cardsBtn = document.getElementById("view-cards");
+      const chatBtn = document.getElementById("view-chat");
+      if (cardsBtn) cardsBtn.onclick = () => { setView("cards"); renderJobDetail(lastJob); };
+      if (chatBtn) chatBtn.onclick = () => { setView("chat"); renderJobDetail(lastJob); };
+      const qBtn = document.getElementById("toggle-questions");
+      if (qBtn) qBtn.onclick = () => {
+        setQuestionsOpen(!questionsOpen());
+        renderJobDetail(lastJob);
+      };
+      const form = document.getElementById("chat-form");
+      const input = document.getElementById("chat-input");
+      if (form) form.onsubmit = (ev) => { ev.preventDefault(); sendChat(j.id); };
+      bindChatAttach(j.id);
+      if (input) {
+        input.focus();
+        input.onkeydown = (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendChat(j.id);
+          }
+        };
+        input.addEventListener("input", () => {
+          input.style.height = "auto";
+          input.style.height = Math.min(input.scrollHeight, 140) + "px";
+        });
+      }
+      const cardsAttach = document.getElementById("cards-attach");
+      const cardsFiles = document.getElementById("cards-files");
+      if (cardsAttach && cardsFiles) {
+        cardsAttach.onclick = () => cardsFiles.click();
+        cardsFiles.onchange = async () => {
+          const files = [...(cardsFiles.files || [])];
+          cardsFiles.value = "";
+          if (!files.length) return;
+          await sendFilesOnly(j.id, files);
+        };
+      }
+      const thread = document.getElementById("chat-thread");
+      if (thread) thread.scrollTop = thread.scrollHeight;
+    }
+
+    function bindChatAttach(jobId) {
+      const pick = document.getElementById("chat-attach");
+      const input = document.getElementById("chat-files");
+      const form = document.getElementById("chat-form");
+      paintAttachChips();
+      if (pick && input) {
+        pick.onclick = () => input.click();
+        input.onchange = () => {
+          queuePendingFiles(input.files);
+          input.value = "";
+        };
+      }
+      if (!form) return;
+      form.ondragover = (e) => { e.preventDefault(); form.classList.add("drag"); };
+      form.ondragleave = () => form.classList.remove("drag");
+      form.ondrop = (e) => {
+        e.preventDefault();
+        form.classList.remove("drag");
+        queuePendingFiles(e.dataTransfer && e.dataTransfer.files);
+      };
+    }
+
+    function queuePendingFiles(list) {
+      const incoming = [...(list || [])].filter(f => f && f.name);
+      for (const f of incoming) {
+        if (pendingChatFiles.some(p => p.name === f.name && p.size === f.size)) continue;
+        pendingChatFiles.push(f);
+      }
+      paintAttachChips();
+    }
+
+    function paintAttachChips() {
+      const el = document.getElementById("chat-attach-chips");
+      if (!el) return;
+      el.innerHTML = pendingChatFiles.map((f, i) => `
+        <span class="attach-chip">
+          <span class="truncate">${esc(f.name)}</span>
+          <button type="button" data-drop="${i}" aria-label="Remove">×</button>
+        </span>`).join("");
+      el.querySelectorAll("[data-drop]").forEach(btn => {
+        btn.onclick = () => {
+          pendingChatFiles.splice(Number(btn.dataset.drop), 1);
+          paintAttachChips();
+        };
+      });
+    }
+
+    async function uploadJobFiles(jobId, files, note) {
+      const fd = new FormData();
+      for (const f of files) fd.append("files", f, f.name);
+      if (note) fd.append("note", note);
+      return api("/jobs/" + jobId + "/files", { method: "POST", body: fd });
+    }
+
+    async function sendFilesOnly(jobId, files) {
+      try {
+        const data = await uploadJobFiles(jobId, files, "");
+        lastJob = data.job || lastJob;
+        if (data.process_started) {
+          pollTicks = 0;
+          await loadJobDetail(jobId);
+        } else {
+          renderJobDetail(data.job || lastJob);
+          await refreshSidebar();
+        }
+      } catch (e) {
+        alert(e.message || e);
+      }
+    }
+
+    async function sendChat(jobId) {
+      const input = document.getElementById("chat-input");
+      const err = document.getElementById("chat-err");
+      const sendBtn = document.getElementById("chat-send");
+      const thread = document.getElementById("chat-thread");
+      const wrap = thread && thread.querySelector(".max-w-3xl");
+      const text = (input && input.value || "").trim();
+      const files = pendingChatFiles.slice();
+      if ((!text && !files.length) || (input && input.dataset.busy === "1")) return;
+      if (input) {
+        input.value = "";
+        input.style.height = "auto";
+        input.dataset.busy = "1";
+      }
+      pendingChatFiles = [];
+      paintAttachChips();
+      if (sendBtn) sendBtn.disabled = true;
+      if (err) err.textContent = "";
+      const preview = text || (files.length ? ("Uploaded " + files.map(f => f.name).join(", ")) : "");
+      if (wrap) {
+        wrap.insertAdjacentHTML("beforeend", bubble("user", preview) + thinkingHtml());
+      }
+      if (thread) thread.scrollTop = thread.scrollHeight;
+      try {
+        let data;
+        if (files.length) {
+          data = await uploadJobFiles(jobId, files, text);
+        } else {
+          data = await api("/jobs/" + jobId + "/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text }),
+          });
+        }
+        lastJob = data.job || lastJob;
+        if (data.process_started) {
+          pollTicks = 0;
+          await loadJobDetail(jobId);
+        } else {
+          renderJobDetail(data.job || lastJob);
+        }
+        const acc = await api("/jobs/" + jobId + "/suggested-accounts").catch(() => ({ accounts: suggestedAccounts }));
+        suggestedAccounts = acc.accounts || suggestedAccounts;
+        await refreshSidebar();
+      } catch (e) {
+        const think = document.getElementById("thinking");
+        if (think) think.remove();
+        if (wrap) wrap.insertAdjacentHTML("beforeend", bubble("assistant", String(e.message || e)));
+        if (err) err.textContent = String(e.message || e);
+        if (files.length) { pendingChatFiles = files; paintAttachChips(); }
+        if (input) { input.dataset.busy = ""; input.focus(); if (text) input.value = text; }
+        if (sendBtn) sendBtn.disabled = false;
+      }
+    }
+
+    async function retryProcess(jobId) {
+      pollTicks = 0;
+      try {
+        await api("/jobs/" + jobId + "/process", { method: "POST" });
+      } catch (e) {
+        alert(e.message || e);
+      }
+      await loadJobDetail(jobId);
+    }
+
+    async function approveJob(jobId) {
+      try {
+        await api("/jobs/" + jobId + "/approve", { method: "POST" });
+        await loadJobDetail(jobId);
+      } catch (e) {
+        alert(e.message || e);
+      }
+    }
+
+    function pillsForQuestion(e) {
+      const proposed = (e.proposed_account || "").trim();
+      let names = [...suggestedAccounts];
+      if (proposed && !names.includes(proposed)) names.unshift(proposed);
+      const top = names.slice(0, 6);
+      return { top, proposed };
+    }
+
+    function questionCard(jobId, e, index, total) {
+      const kind = e.kind || "unknown";
+      const { top, proposed } = pillsForQuestion(e);
+      const badge = KIND_LABEL[kind] || kind;
+      const isNew = (e.question || "").includes("New payee");
+      const facts = questionFacts(e);
+
+      if (kind === "duplicate") {
+        return `
+          <div class="q-card bg-panel border border-line rounded-xl p-5 mb-4" data-eid="${esc(e.id)}">
+            <p class="text-xs text-muted mb-1">Question ${index} of ${total}</p>
+            <span class="text-xs font-bold uppercase bg-navy2 text-mist px-2 py-0.5 rounded">${esc(badge)}</span>
+            ${facts}
+            <p class="mt-3 text-sm text-mist/90">Same date, amount and payee appear twice. Keep both if they are two real payments. Mark as a repeat if the bank listed the same thing twice.${tip("A repeat is left out of the working file. Keep both if you are not sure.")}</p>
+            <div class="flex gap-2 mt-4 flex-wrap">
+              <button type="button" data-resolve data-job="${esc(jobId)}" data-eid="${esc(e.id)}" data-action="accept" class="pill px-4 py-2 rounded-lg border border-line text-sm bg-gold text-navy font-medium">Keep both</button>
+              <button type="button" data-resolve data-job="${esc(jobId)}" data-eid="${esc(e.id)}" data-action="exclude_repeat" class="pill px-4 py-2 rounded-lg border border-line text-sm">This is a repeat</button>
+            </div>
+            <p class="err text-amber-400 text-xs mt-2"></p>
+          </div>`;
+      }
+
+      if (kind === "missing_document") {
+        return `
+          <div class="q-card bg-panel border border-line rounded-xl p-5 mb-4" data-eid="${esc(e.id)}">
+            <p class="text-xs text-muted mb-1">Question ${index} of ${total}</p>
+            <span class="text-xs font-bold uppercase bg-navy2 text-mist px-2 py-0.5 rounded">${esc(badge)}</span>
+            <p class="mt-3 text-mist leading-relaxed">${esc(e.question)}</p>
+            <p class="text-xs text-muted mt-2">If you have the rest of the statement, attach it in Chat with a message. Or carry on with what is already on this job.</p>
+            <button type="button" data-resolve data-job="${esc(jobId)}" data-eid="${esc(e.id)}" data-action="accept" class="mt-4 pill px-4 py-2 rounded-lg border bg-gold text-navy text-sm font-medium">Carry on without it</button>
+            <p class="err text-amber-400 text-xs mt-2"></p>
+          </div>`;
+      }
+
+      const pillHtml = top.map(name => {
+        const primary = name === proposed ? "pill-primary" : "";
+        const action = proposed && name === proposed && !isNew ? "accept" : "override";
+        return `<button type="button" data-resolve data-job="${esc(jobId)}" data-eid="${esc(e.id)}" data-action="${action}" data-account="${esc(name)}" data-vat="${esc(e.proposed_vat || "NV")}" class="pill ${primary} px-3 py-1.5 rounded-full border border-line text-sm">${esc(name)}</button>`;
+      }).join("");
+
+      const help = isNew
+        ? `Not in last year's file. Pick the Excel column this ${ (e.debit_credit || "").toLowerCase() === "credit" ? "receipt" : "payment" } should sit under.`
+        : (e.question || "Pick the column this line should sit under.");
+
+      return `
+        <div class="q-card bg-panel border border-line rounded-xl p-5 mb-4" data-eid="${esc(e.id)}">
+          <p class="text-xs text-muted mb-1">Question ${index} of ${total}</p>
+          <span class="text-xs font-medium uppercase ${isNew ? "bg-white/10 text-mist" : "bg-navy2 text-mist"} px-2 py-0.5 rounded">${isNew ? "New payee" : esc(badge)}</span>
+          ${facts}
+          <p class="mt-3 text-sm text-mist/90 leading-relaxed">${esc(help)}${tip("A column is just the heading in last year's spreadsheet, like Motor, Phone or Sales. Use the same one if you can.")}</p>
+          <p class="text-xs text-muted mt-2">Do not use Suspense just to skip it.${tip("Suspense is a holding column when you must ask the client what it is. It is not a dumping ground. Pick a real column if you know it.")}</p>
+          <div class="flex gap-2 mt-4 flex-wrap items-center">${pillHtml}
+            <button type="button" data-toggle-other class="pill px-3 py-1.5 rounded-full border border-dashed border-line text-sm text-muted">Other…</button>
+          </div>
+          <div class="other-panel hidden mt-4 space-y-2">
+            <label class="text-xs text-muted flex items-center">Column name${tip("Type the heading this should live under in the Excel. Example: Motor, Phone, Salaries, Sales.")}</label>
+            <div class="flex flex-wrap gap-2 items-center">
+              <input data-account class="border border-line rounded-lg px-2 py-1.5 text-sm flex-1 min-w-[160px]" placeholder="e.g. Motor" value="${esc(proposed || "")}" />
+              <select data-vat class="border border-line rounded-lg px-2 py-1.5 text-sm" title="VAT treatment">
+                ${VAT_CODES.map(v => `<option value="${v}" ${v === (e.proposed_vat || "NV") ? "selected" : ""}>${esc(VAT_LABEL[v] || v)}</option>`).join("")}
+              </select>
+              ${tip("VAT on this line. NV means no VAT. SR is standard 20%. If you are unsure, leave NV.")}
+              <button type="button" data-resolve data-job="${esc(jobId)}" data-eid="${esc(e.id)}" data-action="override" data-use-other="1" class="pill px-4 py-2 rounded-lg bg-gold text-navy text-sm font-medium">Save answer</button>
+            </div>
+          </div>
+          <p class="err text-amber-400 text-xs mt-2"></p>
+        </div>`;
+    }
+
+    async function resolveQuestion(btn) {
+      const card = btn.closest(".q-card");
+      const err = card.querySelector(".err");
+      err.textContent = "Saving…";
+      card.querySelectorAll("button").forEach(b => b.disabled = true);
+      const body = { action: btn.dataset.action };
+      if (body.action === "override") {
+        if (btn.dataset.useOther) {
+          body.account_name = card.querySelector("[data-account]").value.trim();
+          body.vat_code = card.querySelector("[data-vat]").value;
+        } else if (btn.dataset.account) {
+          body.account_name = btn.dataset.account;
+          body.vat_code = btn.dataset.vat || "NV";
+        }
+        if (!body.account_name) {
+          err.textContent = "Enter a column name.";
+          card.querySelectorAll("button").forEach(b => b.disabled = false);
+          return;
+        }
+      }
+      try {
+        const job = await api(`/jobs/${btn.dataset.job}/exceptions/${btn.dataset.eid}/resolve`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        lastJob = job;
+        if (body.account_name && !suggestedAccounts.includes(body.account_name)) {
+          suggestedAccounts.unshift(body.account_name);
+        }
+        card.classList.add("leaving");
+        await new Promise(r => setTimeout(r, 180));
+        const remaining = (job.exceptions || []).length;
+        const finished = remaining === 0;
+        if (finished || !document.getElementById("questions")) {
+          renderJobDetail(job, { keepScroll: true });
+        } else {
+          paintQuestionList(job);
+        }
+        refreshSidebar();
+      } catch (e) {
+        err.textContent = String(e.message || e);
+        card.querySelectorAll("button").forEach(b => b.disabled = false);
+      }
+    }
+
+    async function openNewJobModal() {
+      try {
+        const meta = await api("/jobs/meta/clients");
+        clientsCache = meta.clients || [];
+      } catch {
+        clientsCache = [];
+      }
+      const types = await api("/jobs/meta/types");
+      const opts = (types.job_types || [])
+        .sort((a, b) => (a.id === "company_accounts" ? -1 : b.id === "company_accounts" ? 1 : 0))
+        .map(t => `<option value="${esc(t.id)}">${esc(t.label)}</option>`).join("");
+
+      document.getElementById("modal-root").classList.remove("hidden");
+      document.getElementById("modal-panel").innerHTML = `
+        <h2 class="text-xl font-semibold text-mist">New job</h2>
+        <p class="text-sm text-muted mt-1">Upload the bank file. Add last year's Excel for year-end. Extra papers stay on the job.</p>
+        ${showDemo ? `<p class="text-xs text-slate-500 mt-2">Internal dummy pack (Northbridge Demo Ltd):
+          <a class="underline" href="/static/demo/northbridge-bank.csv" download>bank CSV</a>
+          ·
+          <a class="underline" href="/static/demo/northbridge-comparative.xlsx" download>last year Excel</a>
+        </p>` : ""}
+        <form id="new-job-form" class="mt-4 space-y-3">
+          <div>
+            <label class="text-xs font-semibold text-slate-500 uppercase">Job title</label>
+            <input name="title" required class="w-full border border-line rounded-lg px-3 py-2 mt-1" placeholder="e.g. Feb 2026 year-end" />
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-500 uppercase">Client</label>
+            <input name="client_name" required list="client-list" class="w-full border border-line rounded-lg px-3 py-2 mt-1" />
+            <datalist id="client-list">${clientsCache.map(c => `<option value="${esc(c)}">`).join("")}</datalist>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-500 uppercase flex items-center">Job type${tip("Company Accounts = year-end working file. VAT Return = VAT period. Use the type MA would put on the job.")}</label>
+            <select name="job_type" required class="w-full border border-line rounded-lg px-3 py-2 mt-1">${opts}</select>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-xs font-semibold text-slate-500 uppercase">Period start</label>
+              <input type="date" name="period_start" class="w-full border border-line rounded-lg px-3 py-2 mt-1" />
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-500 uppercase">Period end</label>
+              <input type="date" name="period_end" class="w-full border border-line rounded-lg px-3 py-2 mt-1" />
+            </div>
+          </div>
+          <div>
+            <span class="text-xs font-semibold text-slate-500 uppercase">Bank file</span>
+            <label class="file-drop relative mt-1">
+              <input type="file" name="bank_file" required accept=".csv,.xlsx,.xlsm,.pdf" />
+              <p class="text-sm font-medium text-mist">Drop the bank CSV, Excel or PDF</p>
+              <p class="text-xs text-muted mt-1">This is the statement Bridgit codes. CSV or Excel is best.</p>
+              <p class="file-drop-name text-xs text-muted mt-2">Click or drop a file</p>
+            </label>
+          </div>
+          <div>
+            <span class="text-xs font-semibold text-slate-500 uppercase flex items-center">Last year / comparative${tip("The completed Excel from last year. Bridgit copies known payees from it. Needed for year-end.")}</span>
+            <label class="file-drop relative mt-1">
+              <input type="file" name="comparative_file" accept=".xlsx,.xlsm" />
+              <p class="text-sm font-medium text-mist">Drop last year's working Excel</p>
+              <p class="text-xs text-muted mt-1">.xlsx from the prior year. Optional for VAT, expected for year-end.</p>
+              <p class="file-drop-name text-xs text-muted mt-2">Click or drop a file</p>
+            </label>
+          </div>
+          <div>
+            <span class="text-xs font-semibold text-slate-500 uppercase flex items-center">Other papers${tip("Invoices, P60, photos. Kept on the job for the file. Bridgit does not read them line by line yet.")}</span>
+            <label class="file-drop relative mt-1">
+              <input type="file" name="supporting_files" multiple accept=".pdf,.csv,.xlsx,.xlsm,.jpg,.jpeg,.png,.webp" />
+              <p class="text-sm font-medium text-mist">Drop extra papers (optional)</p>
+              <p class="text-xs text-muted mt-1">You can select more than one. Not OCR'd yet.</p>
+              <p class="file-drop-name text-xs text-muted mt-2">Click or drop files</p>
+            </label>
+          </div>
+          <p id="new-job-msg" class="text-sm text-muted min-h-[20px]"></p>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" id="modal-cancel" class="px-4 py-2 rounded-lg border border-line text-sm">Cancel</button>
+            <button type="submit" class="px-4 py-2 rounded-lg bg-gold text-navy text-sm font-medium">Upload and process</button>
+          </div>
+        </form>`;
+      document.getElementById("modal-cancel").onclick = closeModal;
+      document.getElementById("new-job-form").onsubmit = submitNewJob;
+      document.getElementById("new-job-form").querySelectorAll(".file-drop").forEach(wrap => {
+        const input = wrap.querySelector("input[type=file]");
+        const nameEl = wrap.querySelector(".file-drop-name");
+        const show = () => {
+          const files = [...(input.files || [])].filter(f => f && f.name);
+          wrap.classList.toggle("has-file", files.length > 0);
+          nameEl.textContent = files.length ? files.map(f => f.name).join(" · ") : (input.multiple ? "Click or drop files" : "Click or drop a file");
+        };
+        wrap.addEventListener("dragover", e => { e.preventDefault(); wrap.classList.add("drag"); });
+        wrap.addEventListener("dragleave", () => wrap.classList.remove("drag"));
+        wrap.addEventListener("drop", e => {
+          e.preventDefault();
+          wrap.classList.remove("drag");
+          const incoming = e.dataTransfer && e.dataTransfer.files;
+          if (!incoming || !incoming.length) return;
+          try { input.files = incoming; } catch (_) {}
+          show();
+        });
+        input.addEventListener("change", show);
+      });
+    }
+
+    function closeModal() {
+      document.getElementById("modal-root").classList.add("hidden");
+    }
+
+    async function submitNewJob(ev) {
+      ev.preventDefault();
+      const msg = document.getElementById("new-job-msg");
+      msg.textContent = "Uploading…";
+      const fd = new FormData(ev.target);
+      try {
+        const created = await fetch("/jobs", { method: "POST", credentials: "same-origin", body: fd }).then(async r => {
+          if (r.status === 401) {
+            setAuthed(false);
+            location.hash = "#/login";
+            throw new Error("Session expired. Sign in again.");
+          }
+          const b = await r.json();
+          if (!r.ok) throw new Error(typeof b.detail === "string" ? b.detail : (b.detail || r.statusText));
+          return b;
+        });
+        msg.textContent = "Processing… this can take a minute.";
+        try {
+          await api("/jobs/" + created.id + "/process", { method: "POST" });
+        } catch (_) {}
+        closeModal();
+        location.hash = "#/job/" + created.id;
+        route();
+      } catch (e) {
+        msg.textContent = String(e.message || e);
+      }
+    }
+
+    window.addEventListener("hashchange", route);
+    loadAppMeta().finally(() => {
+      if (!location.hash) location.hash = isAuthed() ? "#/jobs" : "#/login";
+      route();
+    });
+  </script>
+</body>
+</html>

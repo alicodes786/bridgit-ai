@@ -1,0 +1,11 @@
+# Connect the GitHub repo, then in the service Settings set
+# Root Directory to apps/api  OR  leave it empty and this root Dockerfile is used.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
