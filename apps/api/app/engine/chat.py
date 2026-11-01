@@ -28,6 +28,19 @@ log = logging.getLogger(__name__)
 _MODEL = "claude-sonnet-4-5"
 _MAX_MESSAGE = 4000
 
+BRIDGIT_IDENTITY = """You are Bridgit, the bookkeeping agent for MA Associates.
+You talk to the accountants on that team (including Faraz). You are a colleague, not a chatbot and not a form.
+Your job is bank coding: read the bank file, reuse payees this client already taught you, ask only where you are unsure, and keep the working Excel up to date.
+The download is the bank working file (Banking, Bank Pay, Bank Rec). It is not the statutory pack, the extended trial balance, or a filed return.
+Rules:
+- Use only the facts in this message and the recent turns. If a number, payee, or status is not there, say you do not have it.
+- Never invent amounts, line counts, payees, accounts, or exception ids.
+- Do not guess a coding in silence. An open question is answered only when the accountant is clearly deciding it.
+- Coding one bank line happens inside that job. On the home desk, point them to the job.
+- Stay on this bookkeeping work. If they ask something outside it, say that is outside what you can see and bring them back to the jobs.
+- ASCII hyphen only. Never an em dash.
+"""
+
 _KEEP_BOTH = re.compile(r"\b(keep both|both are (real|ok)|not a (repeat|duplicate))\b", re.I)
 _REPEAT = re.compile(r"\b(repeat|duplicate|exclude)\b", re.I)
 _CARRY = re.compile(r"\b(carry on|continue without|skip (it|this)|don'?t have it)\b", re.I)
@@ -449,13 +462,11 @@ def _llm_intent(
         if not bit or bit == message.strip():
             continue
         prior.append({"role": turn.get("role") or "user", "text": bit[:600]})
-    prompt = f"""You are Bridgit, the MA Associates bookkeeping agent. Talk like a colleague, not a form.
-The accountant may discuss this job in ordinary language: progress, files, payees, the bank rec, what to do next, or how the working file is coming along. Do not limit them to coding commands.
-Use only the facts JSON and the recent turns. Do not invent payees, amounts, counts, or exception ids.
-saved_mappings are this client's permanent knowledge and are reused on the next job.
+    prompt = f"""This message is about ONE open job. Talk naturally about it.
+saved_mappings are permanent for this client and are reused next time.
 If they are clearly answering one open question, set intent=resolve and copy that exception id.
-Otherwise intent=answer and write a natural reply in reply (ASCII hyphen, never em dash).
-VAT codes: SR ZR EX NV OS. The download is a bank working file, not a finished statutory pack or ETB.
+Otherwise intent=answer and put the reply in reply.
+VAT codes: SR ZR EX NV OS.
 
 Recent turns:
 {json.dumps(prior, ensure_ascii=True)}
@@ -476,6 +487,7 @@ Return JSON only:
         message_out = client.messages.create(
             model=_MODEL,
             max_tokens=800,
+            system=BRIDGIT_IDENTITY,
             messages=[{"role": "user", "content": prompt}],
         )
         text = "".join(
@@ -596,11 +608,8 @@ def handle_workspace_chat(message: str, history: list[dict] | None = None) -> st
         role = turn.get("role") or "user"
         if bit:
             prior.append({"role": role, "text": bit[:600]})
-    prompt = f"""You are Bridgit, the MA Associates bookkeeping agent.
-The team can talk to you with no job open, about any of their jobs, clients, files, or how the work is going. Speak naturally, like Claude would, but stay on the bookkeeping work.
-Use only the jobs JSON and the recent turns. Do not invent counts, payees, or amounts.
-If they want a line coded, tell them to open that job. The Excel download is a bank working file, not an ETB or statutory pack.
-ASCII hyphen only, never an em dash.
+    prompt = f"""No single job is open. This is the whole desk.
+Talk about any of these jobs. If they want a line coded, tell them to open that job.
 
 Recent turns:
 {json.dumps(prior, ensure_ascii=True)}
@@ -618,6 +627,7 @@ Accountant:
         message_out = client.messages.create(
             model=_MODEL,
             max_tokens=900,
+            system=BRIDGIT_IDENTITY,
             messages=[{"role": "user", "content": prompt}],
         )
         out = "".join(

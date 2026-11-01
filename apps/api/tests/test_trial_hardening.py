@@ -16,6 +16,7 @@ from app.auth import (
 )
 from app.config import settings
 from app.engine.chat import (
+    BRIDGIT_IDENTITY,
     _job_facts,
     answer_from_job,
     match_resolve_intent,
@@ -249,6 +250,12 @@ class ChatIntentTests(unittest.TestCase):
 
 
 class WorkspaceChatTests(unittest.TestCase):
+    def test_identity_is_shared(self):
+        self.assertIn("You are Bridgit", BRIDGIT_IDENTITY)
+        self.assertIn("MA Associates", BRIDGIT_IDENTITY)
+        self.assertIn("Never invent", BRIDGIT_IDENTITY)
+        self.assertIn("working file", BRIDGIT_IDENTITY.lower())
+
     def test_desk_chat_does_not_need_a_job(self):
         self.assertTrue(is_protected_path("/meta/chat"))
         reply = workspace_fallback("how are we doing?", [])
