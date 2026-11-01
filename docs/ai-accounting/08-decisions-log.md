@@ -376,6 +376,56 @@ is not a stale upsert.
 **Status:** final for Phase 1 working file. Notes:
 [36-oct25-session.md](./36-oct25-session.md).
 
+### Decision 31 — Job-aware conversation, progress summary, export like Claude
+**Decided:** Beyond coding Q&A, Bridgit should hold **normal conversations**
+about the job it is working on: what data it has (files, line counts, rec status,
+open questions, remembered payees), **how things are going** in plain language,
+and optional **export** of chat and/or job facts (transcript, summary markdown,
+structured snapshot) similar to Claude’s export — without inventing figures or
+coding actions outside open exceptions.
+**Date:** 1 Nov 2026.
+**Why:** `/app` should feel like a proper SaaS agent, not only a form with a
+chat box for “Motor vs Phone”. Accountants will ask “where are we?” and want
+something they can paste into a file note or email.
+**Trade-off accepted:** Grounding rules stay strict (no fake rec numbers, no
+Accept on live client jobs for Ali). Export is a product surface, not a substitute
+for the working Excel. RAG / SharePoint context comes later; Phase 1 export is
+job + mappings + chat already in Supabase.
+**Status:** provisional — document and design next; partial grounding exists in
+`engine/chat.py` today. Live demo pack: [37-live-demo-northbridge.md](./37-live-demo-northbridge.md).
+
+### Decision 32 — Supporting papers (.txt, notes) on New job and clearer intake
+**Decided:** **Next build.** New job and Chat must accept **plain text and other
+supporting papers** (e.g. Meridian insurance `.txt`) alongside PDF/images, with
+copy that explains they are **stored on the job** but **not OCR'd** in Phase 1.
+Today the New job drop zone was CSV/Excel-heavy; Chat already allowed `.txt` in
+the file picker but UX did not make that obvious.
+**Date:** 1 Nov 2026.
+**Why:** Live trial: insurance note could not be uploaded on New job; accountants
+will attach memos, emails saved as .txt, and scans later.
+**Trade-off accepted:** No automatic posting from supporting docs until a later
+phase; classify + store + list in chat is enough for now.
+**Status:** provisional — `.txt` added to New job accept list; full product
+surface (list on job, “what papers do we have?”) still to polish.
+
+### Decision 33 — Visible “working file updated” feedback
+**Decided:** **Next polish (partial now).** Whenever Bridgit **rebuilds the working
+Excel/PDF** (after each answer, after process, after bank re-upload), the UI must
+tell the user: toast and/or inline **“Working file updated”** with last-updated
+time — not silent background refresh.
+**Date:** 1 Nov 2026.
+**Why:** Faraz needs confidence the download reflects the latest answers; feels
+like a proper agent updating deliverables.
+**Status:** provisional — toasts + timestamp on job header in `/app`; extend if
+we move Excel refresh async later.
+
+### Decision 34 — “Test” label on dummy jobs/clients
+**Decided:** Jobs whose **title or client name** contains `test` or `demo`
+(case-insensitive) show a **Test** badge in the sidebar and on the job header.
+Real client names stay unlabelled.
+**Date:** 1 Nov 2026.
+**Status:** final for `/app` trial UI.
+
 ---
 
 ## Template for future decisions

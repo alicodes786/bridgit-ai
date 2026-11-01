@@ -46,6 +46,12 @@ MA Microsoft security).
 `/app`, background process, supporting uploads, mappings as knowledgebase.
 Faraz gets `/app` only. Not ETB.
 
+**[38-live-test-playbook.md](./38-live-test-playbook.md)** — **start here** for
+Railway: Meridian Studio Ltd pack + exact click-by-click tests.
+
+**[37-live-demo-northbridge.md](./37-live-demo-northbridge.md)** — legacy Northbridge
+demo files (`/static/demo/*`).
+
 **[36-oct25-session.md](./36-oct25-session.md)** — 25 Oct evening: Queued vs
 failed, MA Bank Rec, Dummy Test Client deleted, chat-bar uploads after the
 job exists. **Pick up here.**

@@ -1,0 +1,23 @@
+MERIDIAN STUDIO LTD — Bridgit live trial pack (fictional) ★ use this on Railway
+================================================================================
+
+Client story
+  Architecture visualisation studio. Countingup-style CSV + last-year MA Excel.
+  Period: 1 Mar 2025 – 28 Feb 2026. Company accounts (year-end).
+
+Files (New job — upload bank + comparative together)
+  1. meridian-studio-bank.csv
+  2. meridian-studio-comparative.xlsx
+  3. Optional later: meridian-studio-insurance-note.txt (Chat → Add files)
+
+Auto-code from last year (after first process)
+  Vodafone → Phone, Sainsbury's → Motor, BrightPay → Salaries, WeWork → Rent,
+  Adobe/Figma → IT and software, Render Hive → Subcontractors, HMRC, MA Associates,
+  Directors Draw, Apex / Horizon → Sales.
+
+Questions you should see
+  • Duplicate Sainsbury's on 13 Feb (same amount) — choose Keep both once
+  • ParkBee, Deliveroo, Slate Creative Ltd — new payee or Private / Sales
+  • Period coverage — answer once if asked; re-upload same CSV should remember
+
+Full step-by-step live checklist: docs/ai-accounting/38-live-test-playbook.md

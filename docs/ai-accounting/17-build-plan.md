@@ -187,10 +187,13 @@ Apr–Jul vs 77 mappings (exact description, 17 Sep local): 79 auto-coded, 126 p
 - [x] Chat-bar / Cards **Add files** after the job exists (`POST /jobs/{id}/files`).
       Bank or last-year Excel re-runs process; extra papers are stored, not OCR'd.
 - [x] Year-end **Bank Rec** rebuilt as opening + in − out = close, with TIES status
-- [ ] Deploy API to Railway (`BRIDGIT_PASSWORD` required). Dockerfile is in the repo.
+- [x] Deploy API to Railway (`BRIDGIT_PASSWORD` required). Dockerfile is in the repo.
       Run `003_engine_summary.sql` **and** `004_job_chat.sql` on Bridgit Supabase first.
-      Checklist: [36-oct25-session.md](./36-oct25-session.md) and
-      [35-oct25-faraz-trial.md](./35-oct25-faraz-trial.md).
+      Live smoke test: [37-live-demo-northbridge.md](./37-live-demo-northbridge.md).
+- [ ] **Decision 31** — job-aware chat summaries + exportable transcript/data (Claude-like)
+- [x] **Decision 34** — Test badge on jobs/clients with test/demo in the name
+- [~] **Decision 33** — working-file updated toasts + last-updated line (partial in `/app`)
+- [~] **Decision 32** — supporting `.txt` on New job; fuller supporting-doc UX still to build
 - [ ] Vercel Next.js — not needed for this trial (`/app` is the Faraz UI)
 
 This is Bridgit v0. Still not inside the MA dashboard.

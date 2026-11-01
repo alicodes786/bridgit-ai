@@ -300,6 +300,36 @@
     @media (prefers-reduced-motion: reduce) {
       .stage::before, .orb, .orb-ring, .live-dot, .rise, .status-pill.processing { animation: none; }
     }
+    .test-badge {
+      font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.2); color: #c5cbd4; background: rgba(255,255,255,.06);
+    }
+    html[data-theme="light"] .test-badge {
+      border-color: rgba(16,18,24,.15); color: #5e6572; background: rgba(16,18,24,.04);
+    }
+    .file-activity {
+      font-size: 11px; color: #9aa3b2; margin-top: 6px;
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+    .file-activity.updating { color: #d5d8de; }
+    #toast-root {
+      position: fixed; z-index: 60; bottom: 20px; right: 16px; left: 16px;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+      pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto; max-width: min(360px, 100%);
+      padding: 10px 14px; border-radius: 12px;
+      background: rgba(22, 24, 29, .94); border: 1px solid rgba(255,255,255,.12);
+      color: #f4f1ea; font-size: 13px; line-height: 1.4;
+      box-shadow: 0 12px 40px rgba(0,0,0,.35);
+      animation: rise .35s ease both;
+    }
+    html[data-theme="light"] .toast {
+      background: #fff; color: #16181d; border-color: rgba(16,18,24,.1);
+      box-shadow: 0 12px 40px rgba(16,18,24,.12);
+    }
   </style>
 </head>
 <body class="bg-navy text-mist min-h-screen">
@@ -376,6 +406,74 @@
     let pollTimer = null;
     let pollTicks = 0;
     let pendingChatFiles = [];
+    let lastWorkingStamp = {};
+    let lastJobStatus = {};
+
+    function isTestJob(j) {
+      const s = `${j.title || ""} ${j.client_name || ""}`.toLowerCase();
+      return /\btest\b/.test(s) || /\bdemo\b/.test(s);
+    }
+    function testBadge(j) {
+      return isTestJob(j) ? `<span class="test-badge">Test</span>` : "";
+    }
+    function latestWorkingDoc(j) {
+      const docs = (j.documents || []).filter(d => d.kind === "working_file");
+      if (!docs.length) return null;
+      return docs.slice().sort((a, b) => String(a.created_at || "").localeCompare(String(b.created_at || ""))).pop();
+    }
+    function workingStamp(j) {
+      const d = latestWorkingDoc(j);
+      return d ? String(d.created_at || d.id || "") : "";
+    }
+    function formatUpdatedAt(iso) {
+      if (!iso) return "";
+      const dt = new Date(iso);
+      if (Number.isNaN(dt.getTime())) return "";
+      return dt.toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+    }
+    function showToast(message) {
+      let root = document.getElementById("toast-root");
+      if (!root) {
+        root = document.createElement("div");
+        root.id = "toast-root";
+        document.body.appendChild(root);
+      }
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = message;
+      root.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = "0";
+        el.style.transition = "opacity .25s";
+        setTimeout(() => el.remove(), 280);
+      }, 4200);
+    }
+    function workingFileActivityHtml(j) {
+      const wf = latestWorkingDoc(j);
+      if (j.status === "processing") {
+        return `<p class="file-activity updating"><span class="dot"></span>Building working Excel and summary…</p>`;
+      }
+      if (!wf) {
+        return `<p class="file-activity">Working Excel appears after the bank lines are processed.</p>`;
+      }
+      const when = formatUpdatedAt(wf.created_at);
+      return `<p class="file-activity" id="working-file-activity">Working Excel last updated${when ? " · " + esc(when) : ""}. Each answer refreshes the download.</p>`;
+    }
+    function noteWorkingFileChange(j, opts) {
+      opts = opts || {};
+      const id = j.id;
+      const stamp = workingStamp(j);
+      const prev = lastWorkingStamp[id];
+      if (stamp && prev && stamp !== prev && !opts.skipToast) {
+        showToast("Working Excel and summary PDF updated — safe to download again.");
+      }
+      if (stamp) lastWorkingStamp[id] = stamp;
+      const prevSt = lastJobStatus[id];
+      if (prevSt === "processing" && j.status !== "processing" && j.status !== "queued") {
+        if (stamp) showToast("Working file ready — open Working Excel when you like.");
+      }
+      lastJobStatus[id] = j.status;
+    }
 
     function getView() {
       return localStorage.getItem(VIEW_KEY) === "chat" ? "chat" : "cards";
@@ -611,7 +709,8 @@
         </div>
         <div id="modal-root" class="hidden fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div class="rounded-xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6" id="modal-panel"></div>
-        </div>`;
+        </div>
+        <div id="toast-root"></div>`;
       document.getElementById("sign-out").onclick = async () => {
         try {
           await fetch("/meta/logout", { method: "POST", credentials: "same-origin" });
@@ -697,7 +796,10 @@
           const active = j.id === selectedJobId ? "active" : "";
           html += `
             <button type="button" data-id="${esc(j.id)}" class="job-row w-full text-left px-3 py-2 rounded-lg hover:bg-navy2 ${active}">
-              <span class="block font-medium truncate">${esc(j.title)}</span>
+              <span class="flex items-center gap-2 flex-wrap">
+                <span class="font-medium truncate">${esc(j.title)}</span>
+                ${testBadge(j)}
+              </span>
               <span class="text-xs text-slate-400">${esc(j.job_type_label || j.job_type || "-")}</span>
               <span class="block mt-1">${statusPill(j)}</span>
             </button>`;
@@ -884,9 +986,11 @@
             <div class="min-w-0">
               <div class="flex items-center gap-2.5 flex-wrap">
                 <h1 class="text-lg font-semibold tracking-tight text-mist">${esc(j.title)}</h1>
+                ${testBadge(j)}
                 ${statusPill(j)}
               </div>
-              <p class="text-sm text-muted mt-1">${esc(j.client_name || "")}</p>
+              <p class="text-sm text-muted mt-1">${esc(j.client_name || "")}${isTestJob(j) ? " · trial data" : ""}</p>
+              ${workingFileActivityHtml(j)}
             </div>`;
 
       const main = document.getElementById("main");
@@ -905,7 +1009,7 @@
             </div>
             ${factGrid}
           </header>
-          ${j.status === "processing" ? `<div class="shrink-0 px-6 py-2 text-sm text-mist flex items-center gap-2 border-b border-white/6"><span class="dot"></span><span>Working through the bank file…</span></div>` : ""}
+          ${j.status === "processing" ? `<div class="shrink-0 px-6 py-2 text-sm text-mist flex items-center gap-2 border-b border-white/6"><span class="dot"></span><span>Coding the bank file and building your working Excel…</span></div>` : ""}
           ${lastErr ? `<div class="shrink-0 px-6 py-3 border-b border-white/10"><p class="text-sm text-mist font-medium">Processing did not finish.</p><p class="text-xs text-muted mt-1">Files are uploaded. Bridgit hit an error before coding the lines, so it bounced back to Waiting. Click retry.</p>${canRetry ? `<button type="button" id="retry-process" class="mt-2 px-3 py-1.5 rounded-full bg-gold text-navy text-sm font-medium">Retry process</button>` : ""}</div>` : (j.status === "queued" && hasBank ? `<div class="shrink-0 px-6 py-3 border-b border-white/10"><p class="text-sm text-mist">Waiting to process. Files are in; lines are not coded yet.</p><button type="button" id="retry-process" class="mt-2 px-3 py-1.5 rounded-full bg-gold text-navy text-sm font-medium">Process now</button></div>` : "")}
           <div id="chat-thread" class="chat-thread flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-5">
             <div class="max-w-3xl mx-auto">
@@ -961,6 +1065,7 @@
       }
 
       bindJobActions(j);
+      noteWorkingFileChange(j, opts);
       if (opts.keepScroll && mainEl) {
         mainEl.scrollTop = prevScroll;
         const thread = document.getElementById("chat-thread");
@@ -1301,6 +1406,7 @@
         if (finished || !document.getElementById("questions")) {
           renderJobDetail(job, { keepScroll: true });
         } else {
+          noteWorkingFileChange(job);
           paintQuestionList(job);
         }
         refreshSidebar();
@@ -1374,11 +1480,11 @@
             </label>
           </div>
           <div>
-            <span class="text-xs font-semibold text-slate-500 uppercase flex items-center">Other papers${tip("Invoices, P60, photos. Kept on the job for the file. Bridgit does not read them line by line yet.")}</span>
+            <span class="text-xs font-semibold text-slate-500 uppercase flex items-center">Other papers${tip("PDF, photos, or .txt notes (e.g. insurance memo). Stored on the job; not OCR'd in Phase 1.")}</span>
             <label class="file-drop relative mt-1">
-              <input type="file" name="supporting_files" multiple accept=".pdf,.csv,.xlsx,.xlsm,.jpg,.jpeg,.png,.webp" />
+              <input type="file" name="supporting_files" multiple accept=".pdf,.csv,.xlsx,.xlsm,.jpg,.jpeg,.png,.webp,.txt" />
               <p class="text-sm font-medium text-mist">Drop extra papers (optional)</p>
-              <p class="text-xs text-muted mt-1">You can select more than one. Not OCR'd yet.</p>
+              <p class="text-xs text-muted mt-1">Includes .txt notes. You can add more later in Chat → Add files.</p>
               <p class="file-drop-name text-xs text-muted mt-2">Click or drop files</p>
             </label>
           </div>
