@@ -148,8 +148,21 @@
       padding: 2px 8px; border-radius: 999px; border: 1px solid #243044;
       white-space: nowrap; flex-shrink: 0;
     }
-    .job-head-top { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
-    .job-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .job-head { display: flex; flex-direction: column; align-items: stretch; gap: 16px; }
+    .job-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .job-downloads {
+      display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: center;
+      padding-top: 2px;
+    }
+    .job-downloads span { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #8b93a1; }
+    .job-downloads a, .job-downloads button {
+      font-size: 13px; color: #d5d8de; background: none; border: 0; padding: 0;
+      text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+    }
+    .file-chip { font-size: 11px; color: #8b93a1; margin-top: 6px; max-width: 520px; }
+    .file-chip summary { cursor: pointer; }
+    .file-chip ul { margin: 4px 0 0; padding: 0; list-style: none; }
+    .file-chip li { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .fact-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
@@ -165,10 +178,8 @@
     #app-shell.nav-collapsed #side {
       width: 0; min-width: 0; overflow: hidden; border-right: 0; opacity: 0; pointer-events: none;
     }
-    @media (min-width: 1080px) {
-      .job-head-top { flex-direction: row; align-items: flex-start; justify-content: space-between; }
-      .job-actions { justify-content: flex-end; max-width: 460px; }
-    }
+    html[data-theme="light"] .job-downloads a,
+    html[data-theme="light"] .job-downloads button { color: #3d4450; }
     @media (max-width: 860px) {
       #app-shell.nav-collapsed #side { width: min(288px, 88vw); opacity: 1; pointer-events: auto; }
       .side {
@@ -453,13 +464,20 @@
         setTimeout(() => el.remove(), 280);
       }, 4200);
     }
+    function shortName(name) {
+      const text = String(name || "file");
+      return text.length > 48 ? text.slice(0, 22) + "…" + text.slice(-18) : text;
+    }
     function papersOnJobHtml(j) {
       const papers = (j.documents || []).filter(d => d.kind && d.kind !== "working_file" && d.kind !== "summary_pdf");
       if (!papers.length) {
-        return `<p class="text-xs text-muted mt-1">No extra papers yet. Chat → Add files accepts .txt, PDF, and photos. They are kept on the job and not read line by line.</p>`;
+        return `<p class="file-chip">No extra papers. Add a note or PDF from Chat.</p>`;
       }
-      const names = papers.map(d => esc(d.file_name || d.kind)).join(" · ");
-      return `<p class="text-xs text-muted mt-1">On file: ${names}</p>`;
+      const items = papers.map(d => {
+        const full = d.file_name || d.kind || "file";
+        return `<li title="${esc(full)}">${esc(shortName(full))}</li>`;
+      }).join("");
+      return `<details class="file-chip"><summary>${papers.length} file${papers.length === 1 ? "" : "s"} on this job</summary><ul>${items}</ul></details>`;
     }
     function workingFileActivityHtml(j) {
       const wf = latestWorkingDoc(j);
@@ -1115,9 +1133,12 @@
           <button type="button" id="view-chat" class="view-btn px-3 py-1 rounded-full ${view === "chat" ? "active" : "text-muted"}">Chat</button>
         </div>`;
       const dl = `
-        <a class="text-sm border border-white/10 px-3 py-1.5 rounded-full text-mist hover:bg-white/5" href="/jobs/${esc(j.id)}/working-file">Working Excel</a>
-        <a class="text-sm border border-white/10 px-3 py-1.5 rounded-full text-mist hover:bg-white/5" href="/jobs/${esc(j.id)}/summary.pdf">Summary</a>
-        <button type="button" id="export-job-chat" class="text-sm border border-white/10 px-3 py-1.5 rounded-full text-mist hover:bg-white/5">Download chat</button>`;
+        <div class="job-downloads">
+          <span>Downloads</span>
+          <a href="/jobs/${esc(j.id)}/working-file">Working Excel</a>
+          <a href="/jobs/${esc(j.id)}/summary.pdf">Summary</a>
+          <button type="button" id="export-job-chat">Chat</button>
+        </div>`;
       const codedFact = n ? codedShown + " of " + n : "Not coded yet";
       const recFact = recDiff == null ? "Not checked" : (recOk ? "Ties · £0.00" : "Off by £" + recDiff);
       const factGrid = `
@@ -1145,14 +1166,14 @@
         main.className = "stage flex-1 min-h-0 flex flex-col overflow-hidden";
         const chatMsgs = (j.chat || []).map(m => bubble(m.role, m.text)).join("");
         main.innerHTML = `
-          <header class="shrink-0 px-4 sm:px-6 pt-4 pb-4 border-b border-white/6">
-            <div class="job-head-top">
+          <header class="shrink-0 px-4 sm:px-6 pt-5 pb-5 border-b border-white/6">
+            <div class="job-head">
               ${titleBlock}
-              <div class="job-actions">
+              <div class="job-toolbar">
                 ${modeToggle}
                 ${open ? `<button type="button" id="toggle-questions" class="text-sm border border-white/10 px-3 py-1.5 rounded-full">${showQ ? "Hide questions" : "Show questions (" + open + ")"}</button>` : ""}
-                ${dl}
               </div>
+              ${dl}
             </div>
             ${factGrid}
           </header>
@@ -1195,14 +1216,15 @@
       } else {
         main.className = "stage flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 md:p-8";
         main.innerHTML = `
-          <header class="mb-6">
-            <div class="job-head-top">
+          <header class="mb-8">
+            <div class="job-head">
               ${titleBlock}
-              <div class="job-actions">
-                ${modeToggle}${dl}
+              <div class="job-toolbar">
+                ${modeToggle}
                 <button type="button" id="cards-attach" class="text-sm border border-white/10 px-3 py-1.5 rounded-full hover:bg-white/5">Add files</button>
                 <input type="file" id="cards-files" class="hidden" multiple accept=".pdf,.csv,.xlsx,.xlsm,.jpg,.jpeg,.png,.webp,.txt" />
               </div>
+              ${dl}
             </div>
             ${factGrid}
           </header>
